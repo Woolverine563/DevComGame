@@ -1,11 +1,26 @@
 
-
 const GAME_WIDTH = 800;
 const GAME_HEIGHT = 600;
 const friction = 0.0005;
 let canvas = document.getElementById("gameScreen");
 let ctx = canvas.getContext("2d");
 
+
+
+
+class Vector2 {
+    constructor(x, y) {
+        this.x = x;
+        this.y = y;
+    }
+    add(vector) {
+        return new Vector2(this.x + vector.x, this.y + vector.y);
+    }
+
+    dot(vector) {
+        return this.x * vector.x + this.y * vector.y;
+    }
+}
 
 const movement =
 {
@@ -34,11 +49,11 @@ class GameManager {
 
     start() {
         this.tank = new Tank(this);
-        
+
         this.ball = new Ball(this);
         this.IH1 = new InputHandler(this.tank, movement);
-        
-        this.gameObjects = [this.tank,  this.ball];
+
+        this.gameObjects = [this.tank, this.ball];
     }
 
     draw(ctx) {
@@ -92,34 +107,22 @@ function collisionHandler(ball, object) {
     let objectTop = object.position.y - object.height / 2;
     let objectBottom = object.position.y + object.height - object.height / 2;
 
-    if (Math.abs(Math.cos(object.rotation)) < (1 - Math.abs(Math.cos(object.rotation)))) 
-    {
-    objectLeft = object.position.x - object.height / 2;
-    objectRight= object.position.x + object.height - object.height / 2;
-    objectTop = object.position.y - object.width / 2;
-    objectBottom= object.position.y + object.width - object.width / 2;
-    width = object.height;
-    height = object.width;
+    if (Math.abs(Math.cos(object.rotation)) < (1 - Math.abs(Math.cos(object.rotation)))) {
+        objectLeft = object.position.x - object.height / 2;
+        objectRight = object.position.x + object.height - object.height / 2;
+        objectTop = object.position.y - object.width / 2;
+        objectBottom = object.position.y + object.width - object.width / 2;
+        width = object.height;
+        height = object.width;
     }
     let collision = false;
-    if(ballTop <= objectBottom && ballBottom> objectBottom)
+    if(objectLeft>ballRight||objectRight<ballLeft||objectTop>ballBottom||objectBottom<ballTop)
     {
-        ball.position.y = object.position.y +height/2+ball.size;
-        collision = true;
+        collision = false;
     }
-    if(ballBottom >= objectTop && ballTop > objectTop)
-    {
-        ball.position.y = object.position.y -height/2 -ball.size;
-        collision = true;
-    }
-    if(ballLeft <= objectRight && ballRight> objectRight)
-    {
-        ball.position.x = object.position.x +width/2+ball.size;
-        collision = true;
-    }
-    if(ballRight >= objectLeft &&  ballLeft <objectLeft)
-    {
-        ball.position.x = object.position.x -width/2 - ball.size;
+
+
+    else{
         collision = true;
     }
     return collision;
@@ -152,53 +155,53 @@ function collisionHandlerBetweenWallsTank(object) {
             object.speed = 0;
             object.velocity.x = 0;
             object.velocity.y = 0;
-            object.position.x = GAME_WIDTH -object.height/2;
+            object.position.x = GAME_WIDTH - object.height / 2;
         }
         if (objectLeft < 0) {
             object.speed = 0;
             object.velocity.x = 0;
             object.velocity.y = 0;
-            object.position.x = 0 +object.height/2;
+            object.position.x = 0 + object.height / 2;
         }
         if (objectBottom > GAME_HEIGHT) {
-            object.position.y = GAME_HEIGHT-object.width/2;
+            object.position.y = GAME_HEIGHT - object.width / 2;
             object.velocity.x = 0;
             object.velocity.y = 0;
             object.speed = 0
         }
         if (objectTop < 0) {
-            object.position.y = object.width/2;
+            object.position.y = object.width / 2;
             object.velocity.x = 0;
             object.velocity.y = 0;
             object.speed = 0
         }
     }
-    else{
-    if (objectRight > GAME_WIDTH) {
-        object.speed = 0;
-        object.velocity.x = 0;
-        object.velocity.y = 0;
-        object.position.x = GAME_WIDTH -object.width/2;
+    else {
+        if (objectRight > GAME_WIDTH) {
+            object.speed = 0;
+            object.velocity.x = 0;
+            object.velocity.y = 0;
+            object.position.x = GAME_WIDTH - object.width / 2;
+        }
+        if (objectLeft < 0) {
+            object.speed = 0;
+            object.velocity.x = 0;
+            object.velocity.y = 0;
+            object.position.x = 0 + object.width / 2;
+        }
+        if (objectBottom > GAME_HEIGHT) {
+            object.position.y = GAME_HEIGHT - object.height / 2;
+            object.velocity.x = 0;
+            object.velocity.y = 0;
+            object.speed = 0
+        }
+        if (objectTop < 0) {
+            object.position.y = object.height / 2;
+            object.velocity.x = 0;
+            object.velocity.y = 0;
+            object.speed = 0
+        }
     }
-    if (objectLeft < 0) {
-        object.speed = 0;
-        object.velocity.x = 0;
-        object.velocity.y = 0;
-        object.position.x = 0 +object.width/2;
-    }
-    if (objectBottom > GAME_HEIGHT) {
-        object.position.y = GAME_HEIGHT-object.height/2;
-        object.velocity.x = 0;
-        object.velocity.y = 0;
-        object.speed = 0
-    }
-    if (objectTop < 0) {
-        object.position.y = object.height/2;
-        object.velocity.x = 0;
-        object.velocity.y = 0;
-        object.speed = 0
-    }
-}
 }
 function collisionHandlerBetweenWallsBall(ball) {
 
@@ -209,7 +212,7 @@ function collisionHandlerBetweenWallsBall(ball) {
 
     if (ballRight > GAME_WIDTH) {
         ball.velocity.x = - ball.velocity.x;
-        ball.position.x = GAME_WIDTH -ball.size;
+        ball.position.x = GAME_WIDTH - ball.size;
     }
     if (ballLeft < 0) {
         ball.velocity.x = - ball.velocity.x;
@@ -217,7 +220,7 @@ function collisionHandlerBetweenWallsBall(ball) {
     }
     if (ballBottom > GAME_HEIGHT) {
         ball.velocity.y = - ball.velocity.y;
-        ball.position.y = GAME_HEIGHT -ball.size;
+        ball.position.y = GAME_HEIGHT - ball.size;
     }
     if (ballTop < 0) {
         ball.velocity.y = - ball.velocity.y;
@@ -320,16 +323,16 @@ class Ball {
                 this.velocity.y = -this.velocity.y;
             }
         }
-        collisionHandlerBetweenWallsBall(this) 
+        collisionHandlerBetweenWallsBall(this)
         {
 
             this.position.x += this.velocity.x;
             this.position.y += this.velocity.y;
-    
+
         }
 
     }
-    
+
 
 
 }
@@ -348,12 +351,26 @@ class Tank {
             right: false,
         }
 
+        this.a = new Vector2(0, 0);
+        this.b = new Vector2(0, 0);
+        this.c = new Vector2(0, 0);
+        this.d = new Vector2(0, 0);
+        this.vertices =
+            [
+                this.a, this.b, this.c, this.d
+
+            ];
+
+       
+        
+
         this.mass = 5;
         this.hasFired = false;
 
         this.width = 50;
         this.height = 25;
-
+        this.angle = Math.atan2(this.height,this.width);    
+        this.halfDiag = Math.sqrt(Math.pow(this.width/2,2)+Math.pow(this.height/2,2));
         this.angularSpeed = 0.05;
 
         this.tank = document.getElementById("tank");
@@ -381,30 +398,11 @@ class Tank {
 
     }
 
-    // updateVelocity()
-    // {
-    //     if(this.input.up == true)
-    //     {   
-
-    //         this.currentAcc = this.maxAcc;
-    //     }
-    //     else if(this.input.down == true)
-    //     {   
-    //         console.log("lol");
-    //         this.currentAcc = -this.maxAcc;
-    //     }
-    //     else if(this.input.up == false && this.input.down == false)
-    //     {
-    //         this.currentAcc = 0;
-    //     }
-    //     if(this.speed !==0)
-    //     {
-    //         this.acceleration.x =(this.currentAcc-friction)* Math.cos(this.rotation) ;
-    //     this.acceleration.y = (this.currentAcc-friction)* Math.sin(this.rotation);
-    //     }
-
-
-    // }
+    updateVertices()
+    {
+        this.vertices[1].x =this.halfDiag*Math.cos(this.rotation-this.angle);
+        this.vertices[2].x = this.halfDiag*Math.cos(this.rotation+ this.angle);
+    }
 
     updateVelocity() {
         if (this.input.up == true) {
@@ -473,7 +471,7 @@ class Tank {
         // console.log(this.speed* Math.cos(this.rotation));
         // console.log(this.speed* Math.sin(this.rotation));
         collisionHandlerBetweenWallsTank(this);
-        console.log(this.position.y);
+        console.log(this.rotation);
     }
 
 
