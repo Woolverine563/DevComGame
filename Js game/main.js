@@ -28,6 +28,7 @@ const movement =
     's': 'down',
     'a': 'left',
     'd': 'right',
+    'b': 'boost',
 }
 
 const movementP2 =
@@ -75,12 +76,10 @@ class GameManager {
 class InputHandler {
     constructor(tank, movement) {
         document.addEventListener("keydown", (event) => {
-            if (event.keyCode === 66) {
-                tank.hasFired = true;
-            }
-            else {
-                tank.input[movement[event.key]] = true;
-            }
+            
+           
+            tank.input[movement[event.key]] = true;
+            
         }
         );
 
@@ -116,14 +115,30 @@ function collisionHandler(ball, object) {
         height = object.width;
     }
     let collision = false;
-    if(objectLeft>ballRight||objectRight<ballLeft||objectTop>ballBottom||objectBottom<ballTop)
-    {
-        collision = false;
+    if(objectLeft< ballRight && objectRight> ballLeft && objectTop< ballBottom&& objectBottom>ballTop)
+    {   
+        // if(objectLeft+width/2> ballLeft + ball.size/2)
+        // {
+        //     ball.position.x = objectLeft -ball.size;
+        // }
+        // if(objectLeft+width/2<= ballLeft + ball.size/2)
+        // {
+        //     ball.position.x = objectRight;
+        // }
+        // if(objectTop+height/2 < ballTop + ball.size/2)
+        // {
+        //     ball.position.y = objectBottom;
+        // }
+        // if(objectTop+height/2 > ballTop + ball.size/2)
+        // {
+        //     ball.position.y = objectTop - ball.size;
+        // }
+        collision = true;
     }
 
 
     else{
-        collision = true;
+        collision = false;
     }
     return collision;
 
@@ -349,17 +364,18 @@ class Tank {
             down: false,
             left: false,
             right: false,
+            boost: false,
         }
 
-        this.a = new Vector2(0, 0);
-        this.b = new Vector2(0, 0);
-        this.c = new Vector2(0, 0);
-        this.d = new Vector2(0, 0);
-        this.vertices =
-            [
-                this.a, this.b, this.c, this.d
+        // this.a = new Vector2(0, 0);
+        // this.b = new Vector2(0, 0);
+        // this.c = new Vector2(0, 0);
+        // this.d = new Vector2(0, 0);
+        // this.vertices =
+        //     [
+        //         this.a, this.b, this.c, this.d
 
-            ];
+        //     ];
 
        
         
@@ -369,8 +385,10 @@ class Tank {
 
         this.width = 50;
         this.height = 25;
-        this.angle = Math.atan2(this.height,this.width);    
-        this.halfDiag = Math.sqrt(Math.pow(this.width/2,2)+Math.pow(this.height/2,2));
+
+        // this.angle = Math.atan2(this.height,this.width);    
+        // this.halfDiag = Math.sqrt(Math.pow(this.width/2,2)+Math.pow(this.height/2,2));
+
         this.angularSpeed = 0.05;
 
         this.tank = document.getElementById("tank");
@@ -395,23 +413,34 @@ class Tank {
             x: 0,
             y: 0
         }
+        this.boostTime = 0;
+        
 
     }
 
-    updateVertices()
-    {
-        this.vertices[1].x =this.halfDiag*Math.cos(this.rotation-this.angle);
-        this.vertices[2].x = this.halfDiag*Math.cos(this.rotation+ this.angle);
-    }
+    // updateVertices()
+    // {
+    //     this.vertices[1].x =this.halfDiag*Math.cos(this.rotation-this.angle);
+    //     this.vertices[2].x = this.halfDiag*Math.cos(this.rotation+ this.angle);
+    // }
 
     updateVelocity() {
         if (this.input.up == true) {
-
-            this.speed = this.maxSpeed;
+            if(this.input.boost && this.boostTime<3000)
+            {
+                this.speed = this.maxSpeed*2;
+                
+            }
+            else{
+                this.speed = this.maxSpeed;
+                
+            }
+            
         }
         else if (this.input.down == true) {
-            console.log("lol");
+            
             this.speed = -this.maxSpeed;
+            
         }
         else if (this.input.up == false && this.input.down == false) {
             this.speed = 0;
@@ -454,7 +483,15 @@ class Tank {
 
     update(deltaTime) {
 
-
+        if(this.input.boost && this.input.up)
+        {
+            this.boostTime += deltaTime;
+            console.log(this.boostTime);
+        }
+        if(this.boostTime>0 && !this.input.boost)
+        {
+            this.boostTime -= deltaTime;
+        }
         this.updateVelocity();
         this.determineRotation();
 
