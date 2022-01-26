@@ -226,19 +226,19 @@ function collisionHandlerBetweenWallsBall(ball) {
     let ballBottom = ball.position.y + ball.size;
 
     if (ballRight > GAME_WIDTH) {
-        ball.velocity.x = - ball.velocity.x;
+        ball.velocity.x = - 0.80*ball.velocity.x;
         ball.position.x = GAME_WIDTH - ball.size;
     }
     if (ballLeft < 0) {
-        ball.velocity.x = - ball.velocity.x;
+        ball.velocity.x = -  0.80*ball.velocity.x;
         ball.position.x = 0;
     }
     if (ballBottom > GAME_HEIGHT) {
-        ball.velocity.y = - ball.velocity.y;
+        ball.velocity.y = -  0.80*ball.velocity.y;
         ball.position.y = GAME_HEIGHT - ball.size;
     }
     if (ballTop < 0) {
-        ball.velocity.y = - ball.velocity.y;
+        ball.velocity.y = -  0.80*ball.velocity.y;
         ball.position.y = 0;
     }
 
@@ -300,6 +300,7 @@ class Ball {
         this.game = game;
         this.mass = 10;
         this.size = 25;
+        this.friction = 0.0001;
         this.position
             =
         {
@@ -324,7 +325,8 @@ class Ball {
 
     update(deltaTime) {
         this.speed = Math.sqrt(Math.pow(this.velocity.x, 2) + Math.pow(this.velocity.y, 2));
-
+        
+        
         if (collisionHandler(this, this.game.tank)) {
             if (this.game.tank.speed !== 0) {
                 this.speed = 2 * this.game.tank.speed;
@@ -334,17 +336,18 @@ class Ball {
                 this.velocity.y = this.speed * Math.sin(this.game.tank.rotation);
             }
             else {
-                this.velocity.x = -this.velocity.x;
-                this.velocity.y = -this.velocity.y;
+                this.velocity.x = - 0.80*this.velocity.x;
+                this.velocity.y = - 0.80*this.velocity.y;
             }
         }
-        collisionHandlerBetweenWallsBall(this)
-        {
 
+        collisionHandlerBetweenWallsBall(this);
+        
+            
             this.position.x += this.velocity.x;
             this.position.y += this.velocity.y;
 
-        }
+        
 
     }
 
@@ -425,16 +428,17 @@ class Tank {
     // }
 
     updateVelocity() {
-        if (this.input.up == true) {
-            if(this.input.boost && this.boostTime<3000)
-            {
-                this.speed = this.maxSpeed*2;
+        if (this.input.up == true &&!this.input.boost) {
+            
+            
+            this.speed = this.maxSpeed;
                 
-            }
-            else{
-                this.speed = this.maxSpeed;
-                
-            }
+            
+            
+        }
+        else if(this.input.boost &&this.boostTime<3000 )
+        {
+            this.speed = this.maxSpeed*3;
             
         }
         else if (this.input.down == true) {
@@ -456,12 +460,12 @@ class Tank {
                 this.rotation += this.angularSpeed;
 
             }
-            else if (this.input.up) {
+            else if (this.input.up || this.input.boost) {
                 this.rotation -= this.angularSpeed;
             }
         }
         else if (this.input.right) {
-            if (this.input.down) {
+            if (this.input.down || this.input.boost) {
                 this.rotation -= this.angularSpeed;
 
             }
@@ -483,7 +487,7 @@ class Tank {
 
     update(deltaTime) {
 
-        if(this.input.boost && this.input.up)
+        if(this.input.boost)
         {
             this.boostTime += deltaTime;
             console.log(this.boostTime);
