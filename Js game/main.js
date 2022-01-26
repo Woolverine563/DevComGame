@@ -36,7 +36,8 @@ const movementP2 =
     'i': 'up',
     'k': 'down',
     'j': 'left',
-    'l': 'right'
+    'l': 'right',
+    'o': 'boost'
 }
 
 
@@ -146,77 +147,55 @@ function collisionHandler(ball, object) {
 
 
 function collisionHandlerBetweenWallsTank(object) {
-    let objectLeft0 = object.position.x - object.width / 2;
-    let objectRight0 = object.position.x + object.width - object.width / 2;
-    let objectTop0 = object.position.y - object.height / 2;
-    let objectBottom0 = object.position.y + object.height - object.height / 2;
+    let objectLeft = object.position.x - object.width / 2;
+    let objectRight = object.position.x + object.width - object.width / 2;
+    let objectTop = object.position.y - object.height / 2;
+    let objectBottom = object.position.y + object.height - object.height / 2;
 
     let objectLeft90 = object.position.x - object.height / 2;
     let objectRight90 = object.position.x + object.height - object.height / 2;
     let objectTop90 = object.position.y - object.width / 2;
     let objectBottom90 = object.position.y + object.width - object.width / 2;
+     
+    let width = object.width;
+    let height = object.height;
 
-
-    objectLeft = objectLeft0;
-    objectRight = objectRight0;
-    objectTop = objectTop0;
-    objectBottom = objectBottom0;
+    
     if (Math.abs(Math.cos(object.rotation)) < (1 - Math.abs(Math.cos(object.rotation)))) {
         objectLeft = objectLeft90;
         objectRight = objectRight90;
         objectTop = objectTop90;
         objectBottom = objectBottom90;
+        width = object.height;
+        height = object.width
+        
+    }
+    
         if (objectRight > GAME_WIDTH) {
             object.speed = 0;
             object.velocity.x = 0;
             object.velocity.y = 0;
-            object.position.x = GAME_WIDTH - object.height / 2;
+            object.position.x = GAME_WIDTH - width / 2;
         }
         if (objectLeft < 0) {
             object.speed = 0;
             object.velocity.x = 0;
             object.velocity.y = 0;
-            object.position.x = 0 + object.height / 2;
+            object.position.x = 0 + width / 2;
         }
         if (objectBottom > GAME_HEIGHT) {
-            object.position.y = GAME_HEIGHT - object.width / 2;
+            object.position.y = GAME_HEIGHT - height / 2;
             object.velocity.x = 0;
             object.velocity.y = 0;
             object.speed = 0
         }
         if (objectTop < 0) {
-            object.position.y = object.width / 2;
+            object.position.y = height / 2;
             object.velocity.x = 0;
             object.velocity.y = 0;
             object.speed = 0
         }
-    }
-    else {
-        if (objectRight > GAME_WIDTH) {
-            object.speed = 0;
-            object.velocity.x = 0;
-            object.velocity.y = 0;
-            object.position.x = GAME_WIDTH - object.width / 2;
-        }
-        if (objectLeft < 0) {
-            object.speed = 0;
-            object.velocity.x = 0;
-            object.velocity.y = 0;
-            object.position.x = 0 + object.width / 2;
-        }
-        if (objectBottom > GAME_HEIGHT) {
-            object.position.y = GAME_HEIGHT - object.height / 2;
-            object.velocity.x = 0;
-            object.velocity.y = 0;
-            object.speed = 0
-        }
-        if (objectTop < 0) {
-            object.position.y = object.height / 2;
-            object.velocity.x = 0;
-            object.velocity.y = 0;
-            object.speed = 0
-        }
-    }
+    
 }
 function collisionHandlerBetweenWallsBall(ball) {
 
@@ -299,7 +278,7 @@ class Ball {
         this.gameHeight = game.gameHeigth;
         this.game = game;
         this.mass = 10;
-        this.size = 25;
+        this.size = 0.75*25;
         this.friction = 0.0001;
         this.position
             =
@@ -386,8 +365,8 @@ class Tank {
         this.mass = 5;
         this.hasFired = false;
 
-        this.width = 50;
-        this.height = 25;
+        this.width = 0.75*50;
+        this.height = 0.75*25;
 
         // this.angle = Math.atan2(this.height,this.width);    
         // this.halfDiag = Math.sqrt(Math.pow(this.width/2,2)+Math.pow(this.height/2,2));
