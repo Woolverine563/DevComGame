@@ -1,27 +1,108 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
+    <link href="https://unpkg.com/tailwindcss@^1.0/dist/tailwind.min.css" rel="stylesheet">
     <style>
-        #gameScreen
-        {
+        #gameScreen {
             border: 2px solid black;
             height: 600px;
             width: 800px;
             /* background-image: url("back.png"); */
         }
-        img{
-            display:none;
+
+        #main {
+            height: 600px;
+            width: 800px;
+
+        }
+        #pause {
+            height: 600px;
+            width: 800px;
+
+        }
+
+        img {
+            display: none;
+        }
+
+        #start {
+            position: absolute;
+            height: 364px;
+            width: 349px;
+            
+        }
+
+        #settings {
+            position: absolute;
+            height: 207px;
+            width: 349px;
+
+        }
+        #pauseText
+        {
+            font-size: large;
+        }
+        #credits {
+
+
+            position: absolute;
+            height: 54px;
+            width: 349px;
+
+
         }
     </style>
 </head>
+
 <body>
+
     <img src="car.png" alt="" id="tank">
     <img src="ball.png" alt="" id="projectile">
-    <canvas id="gameScreen" width ="800" height = "600"></canvas>
+    <!-- <input type="button" value="2v2" id="2v2">
+    <input type="button" value="controls" id="Controls"> -->
+
+    <div class="fixed inset-0 flex items-center justify-center bg-black" id="main">
+        <div class="bg-black-500 max-w-md w-full p-6 text-center" id="start">
+            <div>
+                <button class="bg-red-500 text-white w-full py-2 rounded-full">
+                    Start Game
+                </button>
+            </div>
+
+        </div>
+        <div class="bg-black-500 max-w-md w-full p-6 text-center" id="settings">
+            <div>
+                <button class="bg-red-500 text-white w-full py-2 rounded-full">
+                    Settings
+                </button>
+            </div>
+
+        </div>
+        <div class="bg-black-500 max-w-md w-full p-6 text-center" id="credits">
+            <div>
+                <button class="bg-red-500 text-white w-full py-2 rounded-full">
+                    Credits
+                </button>
+            </div>
+
+        </div>
+
+    </div>
+    <div class ="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50" id="pause">
+        <div class="text-center text-white " id="pauseText">
+            Paused
+        </div>
+    </div>
+
+    <canvas id="gameScreen" width="800" height="600">
+
+    </canvas>
     <script src="main.js"></script>
 </body>
+
 </html>

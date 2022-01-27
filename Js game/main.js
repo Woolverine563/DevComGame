@@ -1,27 +1,14 @@
 
+
 const GAME_WIDTH = 800;
 const GAME_HEIGHT = 600;
 const friction = 0.0005;
 let canvas = document.getElementById("gameScreen");
 let ctx = canvas.getContext("2d");
-
-
-
-
-class Vector2 {
-    constructor(x, y) {
-        this.x = x;
-        this.y = y;
-    }
-    add(vector) {
-        return new Vector2(this.x + vector.x, this.y + vector.y);
-    }
-
-    dot(vector) {
-        return this.x * vector.x + this.y * vector.y;
-    }
-}
-
+let startGame = document.getElementById("start");
+let mainMenu = document.getElementById("main");
+let pauseMenu = document.getElementById('pause');
+pauseMenu.style.display = 'none';
 const movement =
 {
     'w': 'up',
@@ -41,44 +28,108 @@ const movementP2 =
 }
 
 
+const GAMESTATE =
+{   
+    PAUSED: 0,
+    RUNNING :1,
+    MENU: 2,
+    GAME_OVER: 3
+    
+}
+
+// class MainMenu
+// {
+
+
+
+
+// }
+
 class GameManager {
     constructor(gameWidth, gameHeight, ctx) {
+        
         this.gameWidth = gameWidth;
         this.gameHeight = gameHeight;
+        this.gameState = GAMESTATE.MENU;
+        this.car = new Car(this);
+
+        this.ball = new Ball(this);
+        this.IH1 = new InputHandler(this.car, this);
+        this.gameObjects = [];
 
     }
 
 
     start() {
-        this.tank = new Tank(this);
-
-        this.ball = new Ball(this);
-        this.IH1 = new InputHandler(this.tank, movement);
-
-        this.gameObjects = [this.tank, this.ball];
+        // if(this.gameState !== MENU);
+        this.gameState = GAMESTATE.RUNNING;
+        this.gameObjects = [this.car, this.ball];
+        
     }
 
     draw(ctx) {
+        // if(this.gameState === GAMESTATE.PAUSED)
+        // {
+        //     ctx.rect(0,0,this.gameWidth,this.gameHeight);
+        //     ctx.fillStyle = "rgba(0,0,0,0.5)";
+        //     ctx.fill();
+
+        //     ctx.font = "30px Arial";
+        //     ctx.fillStyle = "white";
+        //     ctx.textAlign = "center";
+
+        //     ctx.fillText("Paused", this.gameWidth/2,this.gameHeight/2);
+        // }
+        // if(this.gameState === GAMESTATE.MENU)
+        // {   
+        //     ctx.rect(0,0,this.gameWidth,this.gameHeight);
+        //     ctx.fillStyle = "rgba(0,0,0)";
+        //     ctx.fill();
+
+        //     // ctx.fillStyle = "grey";
+        //     // ctx.fillRect(this.gameWidth/2-100, this.gameHeight/2-100,150,50);
+        //     // ctx.font = "30px Arial";
+        //     // ctx.fillStyle = "white";
+        //     // ctx.textAlign = "center";
+            
+            
+
+        // }
         this.gameObjects.forEach(object => {
             object.draw(ctx);
         });
     }
     update(deltaTime) {
+        if(this.gameState === GAMESTATE.PAUSED || this.gameState === GAMESTATE.MENU) return;
+
         this.gameObjects.forEach(object => {
             object.update(deltaTime);
         });
-        if (this.tank.hasFired) {
-            this.gameObjects.push(new Projectile(this.tank));
-            this.tank.hasFired = false;
+        
+    }
+
+    toogglePause()
+    {
+        if(this.gameState == GAMESTATE.PAUSED)
+        {   
+            pauseMenu.style.display = 'none';
+            this.gameState = GAMESTATE.RUNNING;
+        }
+        else if(this.gameState == GAMESTATE.RUNNING)
+        {   
+            pauseMenu.style.display = 'flex';
+            this.gameState = GAMESTATE.PAUSED;
         }
     }
 }
 
 class InputHandler {
-    constructor(tank, movement) {
+    constructor(tank, game) {
         document.addEventListener("keydown", (event) => {
             
+           if(event.keyCode == 27) game.toogglePause();
            
+
             tank.input[movement[event.key]] = true;
             
         }
@@ -88,6 +139,12 @@ class InputHandler {
         document.addEventListener("keyup", (event) => {
             tank.input[movement[event.key]] = false;
 
+        });
+
+        startGame.addEventListener('click',() =>{
+            console.log("lol");
+            game.start();
+            mainMenu.style.display = 'none';
         });
     }
 }
@@ -100,8 +157,10 @@ function collisionHandler(ball, object) {
     let ballTop = ball.position.y;
 
     let ballBottom = ball.position.y + ball.size;
+
     let width = object.width;
     let height = object.height;
+
     let objectLeft = object.position.x - object.width / 2;
     let objectRight = object.position.x + object.width - object.width / 2;
     let objectTop = object.position.y - object.height / 2;
@@ -112,12 +171,14 @@ function collisionHandler(ball, object) {
         objectRight = object.position.x + object.height - object.height / 2;
         objectTop = object.position.y - object.width / 2;
         objectBottom = object.position.y + object.width - object.width / 2;
+
         width = object.height;
         height = object.width;
     }
     let collision = false;
     if(objectLeft< ballRight && objectRight> ballLeft && objectTop< ballBottom&& objectBottom>ballTop)
-    {   
+    {  
+
         // if(objectLeft+width/2> ballLeft + ball.size/2)
         // {
         //     ball.position.x = objectLeft -ball.size;
@@ -134,6 +195,7 @@ function collisionHandler(ball, object) {
         // {
         //     ball.position.y = objectTop - ball.size;
         // }
+
         collision = true;
     }
 
@@ -173,27 +235,31 @@ function collisionHandlerBetweenWallsTank(object) {
     
         if (objectRight > GAME_WIDTH) {
             object.speed = 0;
-            object.velocity.x = 0;
-            object.velocity.y = 0;
+            object.velocity.x = -object.velocity.x;
+            object.velocity.y = object.velocity.y;
             object.position.x = GAME_WIDTH - width / 2;
+            object.disableInput = true;
         }
         if (objectLeft < 0) {
             object.speed = 0;
-            object.velocity.x = 0;
-            object.velocity.y = 0;
+            object.velocity.x = -object.velocity.x;
+            object.velocity.y = object.velocity.y;
             object.position.x = 0 + width / 2;
+            object.disableInput = true;
         }
         if (objectBottom > GAME_HEIGHT) {
             object.position.y = GAME_HEIGHT - height / 2;
-            object.velocity.x = 0;
-            object.velocity.y = 0;
+            object.velocity.x = object.velocity.x;
+            object.velocity.y = -object.velocity.y;
+            object.disableInput = true;
             object.speed = 0
         }
         if (objectTop < 0) {
             object.position.y = height / 2;
-            object.velocity.x = 0;
-            object.velocity.y = 0;
-            object.speed = 0
+            object.velocity.x = object.velocity.x;
+            object.velocity.y = -object.velocity.y;
+            object.speed = 0;
+            object.disableInput = true;
         }
     
 }
@@ -270,12 +336,14 @@ function collisionHandlerBetweenWallsBall(ball) {
 
 // }
 
+
+
 class Ball {
 
 
     constructor(game) {
         this.gameWidth = game.gameWidth;
-        this.gameHeight = game.gameHeigth;
+        this.gameHeight = game.gameHeight;
         this.game = game;
         this.mass = 10;
         this.size = 0.75*25;
@@ -306,13 +374,13 @@ class Ball {
         this.speed = Math.sqrt(Math.pow(this.velocity.x, 2) + Math.pow(this.velocity.y, 2));
         
         
-        if (collisionHandler(this, this.game.tank)) {
-            if (this.game.tank.speed !== 0) {
-                this.speed = 2 * this.game.tank.speed;
+        if (collisionHandler(this, this.game.car)) {
+            if (this.game.car.speed !== 0) {
+                this.speed = 2 * this.game.car.speed;
 
-                game.tank.speed = 0;
-                this.velocity.x = this.speed * Math.cos(this.game.tank.rotation);
-                this.velocity.y = this.speed * Math.sin(this.game.tank.rotation);
+                game.car.speed = 0;
+                this.velocity.x = this.speed * Math.cos(this.game.car.rotation);
+                this.velocity.y = this.speed * Math.sin(this.game.car.rotation);
             }
             else {
                 this.velocity.x = - 0.80*this.velocity.x;
@@ -334,7 +402,7 @@ class Ball {
 
 }
 
-class Tank {
+class Car {
 
     constructor(game) {
         this.gameWidth = game.gameWidth;
@@ -359,13 +427,14 @@ class Tank {
 
         //     ];
 
-       
-        
+       this.disableInput = false;
+        this.disableInputDuration =0;
 
         this.mass = 5;
         this.hasFired = false;
 
         this.width = 0.75*50;
+
         this.height = 0.75*25;
 
         // this.angle = Math.atan2(this.height,this.width);    
@@ -407,6 +476,8 @@ class Tank {
     // }
 
     updateVelocity() {
+        if(!this.disableInput)
+        {
         if (this.input.up == true &&!this.input.boost) {
             
             
@@ -430,7 +501,7 @@ class Tank {
         }
         this.velocity.x = this.speed * Math.cos(this.rotation);
         this.velocity.y = this.speed * Math.sin(this.rotation);
-
+        }
     }
 
     determineRotation() {
@@ -465,7 +536,15 @@ class Tank {
     }
 
     update(deltaTime) {
-
+        if(this.disableInput)
+        {  
+            this.disableInputDuration += deltaTime;
+        }
+        if(this.disableInputDuration > 300)
+        {   console.log(this.disableInputDuration);
+            this.disableInputDuration =0;
+            this.disableInput = false;
+        }
         if(this.input.boost)
         {
             this.boostTime += deltaTime;
@@ -488,10 +567,12 @@ class Tank {
 
         this.position.x += this.velocity.x;
         this.position.y += this.velocity.y;
+
         // console.log(this.speed* Math.cos(this.rotation));
         // console.log(this.speed* Math.sin(this.rotation));
+
         collisionHandlerBetweenWallsTank(this);
-        console.log(this.rotation);
+       
     }
 
 
@@ -499,7 +580,6 @@ class Tank {
 
 game = new GameManager(GAME_WIDTH, GAME_HEIGHT, ctx);
 
-game.start();
 
 
 let lastTime = 0;
