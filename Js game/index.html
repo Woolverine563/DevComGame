@@ -12,7 +12,8 @@
             border: 2px solid black;
             height: 600px;
             width: 800px;
-            /* background-image: url("back.png"); */
+            /* background-image: url("bg.png"); */
+            background-color: rgba(0, 0, 0, 0.8)
         }
 
         #main {
@@ -20,11 +21,19 @@
             width: 800px;
 
         }
+
         #pause {
             height: 600px;
             width: 800px;
 
         }
+
+        #settingsMenu {
+            height: 600px;
+            width: 800px;
+
+        }
+
 
         img {
             display: none;
@@ -32,58 +41,155 @@
 
         #start {
             position: absolute;
-            height: 364px;
+            top: 81px;
+            right: 383px;
+            height: 40px;
             width: 349px;
-            
+
+
         }
 
         #settings {
             position: absolute;
-            height: 207px;
+            top: 163px;
+            right: 383px;
+            height: 40px;
             width: 349px;
 
         }
-        #pauseText
-        {
+
+        #pauseText {
             font-size: large;
         }
+
         #credits {
 
 
             position: absolute;
-            height: 54px;
+            top: 250px;
+            right: 383px;
+            height: 40px;
             width: 349px;
 
 
         }
+
+        #goback {
+
+            position: absolute;
+            top: 62px;
+            right: 244px;
+            height: 0px;
+            width: 349px;
+        }
+
+        #gobackMenu {
+            height: 45px;
+            width: 349px;
+        }
+
+        #goback2 {
+
+            position: absolute;
+            top: 47px;
+            right: 260px;
+            height: 46px;
+            width: 349px;
+        }
+
+        #gobackMenu2 {
+            height: 45px;
+            width: 349px;
+        }
+
+        #settingsText {
+            position: absolute;
+            top: 128px;
+            right: 403px;
+            font-size: large;
+        }
+
+        #p1c {
+            position: absolute;
+            top: 206px;
+            right: 465px;
+            font-size: large;
+        }
+
+        #p2c {
+            position: absolute;
+            top: 206px;
+            right: 114px;
+            font-size: large;
+        }
+
+        /* #fp1f {
+
+            position: absolute;
+            top: 234px;
+            right: 659px;
+            width: 12px;
+            height: 12px;
+        }
+
+        #fp1b {
+
+            top: 267px;
+            right: 659px;
+            width: 12px;
+            height: 12px;
+
+        }
+
+        #fp1l {
+
+            position: absolute;
+            top: 310px;
+            right: 659px;
+            width: 12px;
+            height: 12px;
+
+        }
+
+        #fp1r {
+
+            position: absolute;
+            top: 331px;
+            right: 659px;
+            width: 12px;
+            height: 12px;
+
+        } */
     </style>
 </head>
 
 <body>
 
     <img src="car.png" alt="" id="tank">
+    <img src="car2.png" alt="" id="tank2">
     <img src="ball.png" alt="" id="projectile">
     <!-- <input type="button" value="2v2" id="2v2">
     <input type="button" value="controls" id="Controls"> -->
 
     <div class="fixed inset-0 flex items-center justify-center bg-black" id="main">
-        <div class="bg-black-500 max-w-md w-full p-6 text-center" id="start">
+        <div class="bg-black-500 max-w-md w-full text-center" id="start">
             <div>
                 <button class="bg-red-500 text-white w-full py-2 rounded-full">
                     Start Game
                 </button>
+
             </div>
 
         </div>
-        <div class="bg-black-500 max-w-md w-full p-6 text-center" id="settings">
+        <div class="bg-black-500 max-w-md w-full  text-center" id="settings">
             <div>
-                <button class="bg-red-500 text-white w-full py-2 rounded-full">
-                    Settings
+                <button class="bg-red-500 text-white w-full py-2 rounded-full text-lg">
+                    Controls
                 </button>
             </div>
 
         </div>
-        <div class="bg-black-500 max-w-md w-full p-6 text-center" id="credits">
+        <div class="bg-black-500 max-w-md w-full  text-center" id="credits">
             <div>
                 <button class="bg-red-500 text-white w-full py-2 rounded-full">
                     Credits
@@ -93,10 +199,103 @@
         </div>
 
     </div>
-    <div class ="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50" id="pause">
+
+    <div class="fixed inset-0 flex items-center justify-center bg-black" id="settingsMenu">
+        <div class="bg-black-500 max-w-md w-full  text-center" id="goback2">
+
+
+            <div>
+
+                <button class="bg-red-500 text-white w-full py-2 rounded-full">
+                    Return to Main Menu
+                </button>
+
+
+            </div>
+
+        </div>
+
+        <div class="text-center text-white " id="settingsText">
+            Controls
+
+        </div>
+
+
+        <div class="text-center text-white " id="p1c">
+            Player 1 Controls:
+            <div>
+                Use WASD to move. E to activate boosts
+            </div>
+
+
+
+        </div>
+        <!-- <div id='fp1f' class="text-white">
+
+            <button class="bg-green-500 text-white rounded-full ">
+                Forward(w)
+            </button>
+        </div>
+        <div id='fp1b' class="text-white">
+
+            <button class="bg-green-500 text-white rounded-full ">
+                Backward(s)
+            </button>
+        </div>
+
+        <div id='fp1l' class="text-white">
+
+            <button class="bg-green-500 text-white rounded-full ">
+                Left(a)
+            </button>
+        </div>
+        <div id='fp1r' class="text-white">
+
+            <button class="bg-green-500 text-white rounded-full ">
+                Right(d)
+            </button>
+        </div> -->
+
+
+        <div class="text-center text-white " id="p2c">
+            Player 2 Controls
+            <div>
+                Use IJKL to move. O to activate boosts
+            </div>
+
+        </div>
+
+
+
+
+
+
+    </div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <div class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50" id="pause">
         <div class="text-center text-white " id="pauseText">
             Paused
+
         </div>
+        <div id="goback">
+
+            <button class="bg-red-500 text-white w-full py-2 rounded-full">
+                Return to Main Menu
+            </button>
+        </div>
+
     </div>
 
     <canvas id="gameScreen" width="800" height="600">
