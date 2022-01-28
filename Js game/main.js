@@ -3,7 +3,9 @@
 const GAME_WIDTH = 800;
 const GAME_HEIGHT = 600;
 const friction = 0.0005;
+
 let canvas = document.getElementById("gameScreen");
+
 let ctx = canvas.getContext("2d");
 let startGame = document.getElementById("start");
 let mainMenu = document.getElementById("main");
@@ -71,11 +73,15 @@ class GameManager {
 
         this.ball = new Ball(this);
         this.IH1 = new InputHandler(this);
-        this.particle = new Particle(400,300,)
+        this.particle = new Particle(400, 300,)
         this.startReset = false;
         this.countdown = 0;
-        this.particles = [];
+
+        this.calledOnce = false;
+
         this.gameObjects = [];
+
+        this.particles = [];
 
     }
 
@@ -90,6 +96,7 @@ class GameManager {
         this.IH1.car = this.car;
         this.IH1.car2 = this.car2;
         this.gameObjects = [];
+        this.calledOnce = false;
         this.particles = [];
 
     }
@@ -102,6 +109,7 @@ class GameManager {
         this.IH1.car2 = this.car2;
         this.gameObjects = [];
         this.particles = [];
+        this.calledOnce = false;
         game.start();
     }
     start() {
@@ -117,7 +125,8 @@ class GameManager {
             object.draw(ctx);
         });
 
-        this.particles.forEach(object => {
+        this.particles.forEach((object) => {
+
             object.draw(ctx);
         });
 
@@ -126,14 +135,24 @@ class GameManager {
         if (this.gameState === GAMESTATE.PAUSED || this.gameState === GAMESTATE.MENU) return;
 
         this.gameObjects.forEach(object => {
+
             object.update(deltaTime);
         });
-        this.particles.forEach(object => {
-            object.update(deltaTime);
-            
+        this.particles.forEach((object, index) => {
+            if (object.alpha <= 0) {
+                console.log(index);
+
+                this.particles.splice(index, 1);
+            }
+            else {
+                // console.log(this.particles.length);
+
+                object.update(deltaTime);
+            }
+
+
         });
-        if(collisionHandlerBetweenTanks(game.car,game.car2))
-        {
+        if (collisionHandlerBetweenTanks(game.car, game.car2)) {
             this.car.disableInput = true;
             this.car2.disableInput = true;
             let carVx = this.car.velocity.x;
@@ -142,22 +161,23 @@ class GameManager {
             this.car.velocity.y = this.car2.velocity.y;
             this.car2.velocity.x = carVx;
             this.car2.velocity.y = carVy;
-           
-            
+
+
         }
         if (this.startReset) {
 
-           
+
             this.countdown += deltaTime;
             if (this.countdown > 3000) {
                 this.resetToStart();
                 this.startReset = false;
+                this.countdown = 0
             }
 
         }
 
     }
-
+    //f
     togglePause() {
         if (this.gameState == GAMESTATE.PAUSED) {
             pauseMenu.style.display = 'none';
@@ -193,14 +213,14 @@ class InputHandler {
         });
 
         settings.addEventListener('click', () => {
-          
+
 
             mainMenu.style.display = 'none';
 
             settingsMenu.style.display = 'flex';
         });
         startGame.addEventListener('click', () => {
-           
+
             game.start();
             mainMenu.style.display = 'none';
         });
@@ -223,7 +243,7 @@ class InputHandler {
 
 
 
-function projections_intersect(object1, object2){
+function projections_intersect(object1, object2) {
     let relative_angle = object2.rotation - object1.rotation;
     let angle1 = object1.rotation;
     let sep_x = object2.position.x - object1.position.x;
@@ -247,8 +267,8 @@ function projections_intersect(object1, object2){
     return (projection_h && projection_w);
 }
 
-function collisionHandlerBetweenTanks(object1, object2){
-    return(projections_intersect(object1, object2) && projections_intersect(object2, object1));
+function collisionHandlerBetweenTanks(object1, object2) {
+    return (projections_intersect(object1, object2) && projections_intersect(object2, object1));
 }
 
 // to fix
@@ -259,14 +279,13 @@ function collisionHandler(ball, object) {
     let car_x = object.position.x;
     let car_y = object.position.y;
     let theta = object.rotation;
-    
+
     let sep_along_width = (ball_x - car_x) * Math.cos(theta) + (ball_y - car_y) * Math.sin(theta);
     let sep_along_height = (ball_x - car_x) * Math.sin(theta) - (ball_y - car_y) * Math.cos(theta)
-    
+
     let collision_on_width = false;
     let collision_on_height = false
-    if(Math.abs(sep_along_height) < object.height / 2 + ball.size / 2 && Math.abs(sep_along_width) < object.width / 2 + ball.size / 2)
-    {  
+    if (Math.abs(sep_along_height) < object.height / 2 + ball.size / 2 && Math.abs(sep_along_width) < object.width / 2 + ball.size / 2) {
 
         // if(objectLeft+width/2> ballLeft + ball.size/2)
         // {
@@ -286,14 +305,14 @@ function collisionHandler(ball, object) {
         // }
 
         if
-        (Math.abs(-Math.abs(sep_along_height) + object.height / 2 + ball.size / 2)
-         < Math.abs(-Math.abs(sep_along_width) + object.width / 2 + ball.size / 2))
-        return('w');
-        else return('h');
+            (Math.abs(-Math.abs(sep_along_height) + object.height / 2 + ball.size / 2)
+            < Math.abs(-Math.abs(sep_along_width) + object.width / 2 + ball.size / 2))
+            return ('w');
+        else return ('h');
     }
 
 
-    else{
+    else {
         return false;
     }
 }
@@ -360,6 +379,10 @@ function collisionHandlerBetweenWallsBall(ball) {
     let ballRight = ball.position.x + ball.size;
     let ballTop = ball.position.y;
     let ballBottom = ball.position.y + ball.size;
+    let r = String(Math.floor(Math.random() * 255));
+    let g = String(Math.floor(Math.random() * 255));
+    let b = String(Math.floor(Math.random() * 255));
+    let str = "rgb("
 
     if (ballRight > GAME_WIDTH && !(ballTop >= 200 && ballBottom <= 400)) {
         ball.velocity.x = - 0.80 * ball.velocity.x;
@@ -378,19 +401,41 @@ function collisionHandlerBetweenWallsBall(ball) {
         ball.position.y = 0;
     }
     if (ballRight > GAME_WIDTH && (ballTop >= 200 && ballBottom <= 400)) {
-        for (let i = 0; i < 10; i++)
-        {
-            game.particles.push(new Particle(GAME_WIDTH-50,GAME_HEIGHT/2,3,"white", -4, 4));
+        if (!game.calledOnce) {
+
+
+            for (let i = 0; i < 50; i++) {
+                let r = String(Math.floor(Math.random() * 255));
+                let g = String(Math.floor(Math.random() * 255));
+                let b = String(Math.floor(Math.random() * 255));
+                let str = "rgb("
+                game.particles.push(new Particle(GAME_WIDTH - 100, 300, Math.random() * 2, str.concat(r, ",", g, ",", b, ")"), (Math.random() - 0.5) * 4, (Math.random() - 0.5) * 4));
+                console.log("here");
+
+            }
+
+            game.calledOnce = true;
         }
         game.startReset = true;
+        game.gameObjects.splice(2,1);
 
     }
     if (ballLeft < 0 && (ballTop >= 200 && ballBottom <= 400)) {
-        for (let i = 0; i < 10; i++)
-        {
-            game.particles.push(new Particle(50,GAME_HEIGHT/2,3,"white",4,4));
+        if (!game.calledOnce) {
+            for (let i = 0; i < 50; i++) {
+                let r = String(Math.floor(Math.random()*255));
+            let g = String(Math.floor(Math.random()*255));
+             let b = String(Math.floor(Math.random()*255));
+            let str = "rgb("
+                game.particles.push(new Particle(100, 300, Math.random() * 2, str.concat(r, ",", g, ",", b, ")"), (Math.random() - 0.5) * 4, (Math.random() - 0.5) * 4));
+                console.log("here");
+            }
+            game.calledOnce = true;
+
         }
+
         game.startReset = true;
+        game.gameObjects.splice(2,1);
     }
 
 }
@@ -398,7 +443,7 @@ function collisionHandlerBetweenWallsBall(ball) {
 
 
 class Particle {
-    constructor(x, y, radius, colour,vX,vY) {
+    constructor(x, y, radius, colour, vX, vY) {
 
 
 
@@ -406,15 +451,19 @@ class Particle {
         this.y = y;
         this.radius = radius;
         this.colour = colour;
+        this.alpha = 1;
         this.vX = vX;
-        this.vy = vY;
+        this.vY = vY;
     }
 
     draw(ctx) {
+        ctx.save();
+        ctx.globalAlpha = this.alpha;
         ctx.beginPath();
-        ctx.arc(this.x, this.y, this.radius, 0, Math.PI*2, true);
-        ctx.fillStyle = 'white';
+        ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2, true);
+        ctx.fillStyle = this.colour;
         ctx.fill();
+        ctx.restore();
     }
 
 
@@ -422,6 +471,10 @@ class Particle {
     update(deltaTime) {
         this.x += this.vX;
         this.y += this.vY;
+        this.alpha -= 0.01;
+        //    console.log(this.vX);
+        //    console.log(this.vX);
+
 
 
     }
@@ -438,9 +491,9 @@ class Ball {
         this.gameWidth = game.gameWidth;
         this.gameHeight = game.gameHeight;
         this.game = game;
-        this.mass = 10;
+
         this.size = 0.75 * 25;
-        this.friction = 0.0001;
+
         this.position
             =
         {
@@ -488,10 +541,10 @@ class Ball {
         }
 
         if (collisionHandler(this, this.game.car2)) {
-            
+
             if (this.game.car2.speed !== 0) {
                 this.speed = 2 * this.game.car2.speed;
-                
+
                 game.car2.speed = 0;
                 this.velocity.x = this.speed * Math.cos(this.game.car2.rotation);
                 this.velocity.y = this.speed * Math.sin(this.game.car2.rotation);
@@ -533,28 +586,17 @@ class Car {
             boost: false,
         }
 
-        // this.a = new Vector2(0, 0);
-        // this.b = new Vector2(0, 0);
-        // this.c = new Vector2(0, 0);
-        // this.d = new Vector2(0, 0);
-        // this.vertices =
-        //     [
-        //         this.a, this.b, this.c, this.d
 
-        //     ];
 
         this.disableInput = false;
         this.disableInputDuration = 0;
 
-        this.mass = 5;
-        this.hasFired = false;
+
 
         this.width = 0.75 * 50;
 
         this.height = 0.75 * 25;
 
-        // this.angle = Math.atan2(this.height,this.width);    
-        // this.halfDiag = Math.sqrt(Math.pow(this.width/2,2)+Math.pow(this.height/2,2));
 
         this.angularSpeed = 0.05;
 
@@ -579,11 +621,7 @@ class Car {
 
     }
 
-    // updateVertices()
-    // {
-    //     this.vertices[1].x =this.halfDiag*Math.cos(this.rotation-this.angle);
-    //     this.vertices[2].x = this.halfDiag*Math.cos(this.rotation+ this.angle);
-    // }
+
 
     updateVelocity() {
         if (!this.disableInput) {
@@ -617,10 +655,9 @@ class Car {
             this.velocity.y = this.speed * Math.sin(this.rotation);
         }
     }
-    reverseVelocities()
-    {
-        this.velocity.x = - 0.8*this.velocity.x;
-        this.velocity.y = - 0.8*this.velocity.y;
+    reverseVelocities() {
+        this.velocity.x = - 0.8 * this.velocity.x;
+        this.velocity.y = - 0.8 * this.velocity.y;
     }
     determineRotation() {
         if (this.input.left) {
@@ -670,24 +707,18 @@ class Car {
             this.boostTime -= deltaTime;
         }
         this.updateVelocity();
-       
+
         this.determineRotation();
         collisionHandlerBetweenWallsTank(this);
-        
 
-        
 
-        // if(this.speed<this.maxSpeed){
-        // this.speed += this.currentAcc;
-        // this.velocity.x += this.acceleration.x;
-        // this.velocity.y += this.acceleration.y;
-        // }
+
+
 
         this.position.x += this.velocity.x;
         this.position.y += this.velocity.y;
 
-        // console.log(this.speed* Math.cos(this.rotation));
-        // console.log(this.speed* Math.sin(this.rotation));
+
 
 
 
