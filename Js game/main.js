@@ -78,7 +78,7 @@ class GameManager {
         this.countdown = 0;
 
         this.calledOnce = false;
-
+        this.std = new Stadium();
         this.gameObjects = [];
 
         this.particles = [];
@@ -96,6 +96,7 @@ class GameManager {
         this.IH1.car = this.car;
         this.IH1.car2 = this.car2;
         this.gameObjects = [];
+        this.std = new Stadium();
         this.calledOnce = false;
         this.particles = [];
 
@@ -109,6 +110,7 @@ class GameManager {
         this.IH1.car2 = this.car2;
         this.gameObjects = [];
         this.particles = [];
+        this.std = new Stadium();
         this.calledOnce = false;
         game.start();
     }
@@ -116,11 +118,12 @@ class GameManager {
         // if(this.gameState !== MENU);
         this.gameState = GAMESTATE.RUNNING;
         this.gameObjects = [this.car, this.car2, this.ball];
+        
 
     }
 
     draw(ctx) {
-
+        this.std.draw(ctx);
         this.gameObjects.forEach(object => {
             object.draw(ctx);
         });
@@ -240,6 +243,12 @@ class InputHandler {
 
     }
 }
+
+
+
+
+
+
 
 
 
@@ -409,7 +418,7 @@ function collisionHandlerBetweenWallsBall(ball) {
                 let g = String(Math.floor(Math.random() * 255));
                 let b = String(Math.floor(Math.random() * 255));
                 let str = "rgb("
-                game.particles.push(new Particle(GAME_WIDTH - 100, 300, Math.random() * 2, str.concat(r, ",", g, ",", b, ")"), (Math.random() - 0.5) * 4, (Math.random() - 0.5) * 4));
+                game.particles.push(new Particle(GAME_WIDTH - 100, GAME_HEIGHT/2, Math.random() * 2, str.concat(r, ",", g, ",", b, ")"), (Math.random() - 0.5) * 4, (Math.random() - 0.5) * 4));
                 console.log("here");
 
             }
@@ -427,7 +436,7 @@ function collisionHandlerBetweenWallsBall(ball) {
             let g = String(Math.floor(Math.random()*255));
              let b = String(Math.floor(Math.random()*255));
             let str = "rgb("
-                game.particles.push(new Particle(100, 300, Math.random() * 2, str.concat(r, ",", g, ",", b, ")"), (Math.random() - 0.5) * 4, (Math.random() - 0.5) * 4));
+                game.particles.push(new Particle(100, GAME_HEIGHT/2, Math.random() * 2, str.concat(r, ",", g, ",", b, ")"), (Math.random() - 0.5) * 4, (Math.random() - 0.5) * 4));
                 console.log("here");
             }
             game.calledOnce = true;
@@ -439,6 +448,63 @@ function collisionHandlerBetweenWallsBall(ball) {
     }
 
 }
+
+
+
+class Stadium
+{
+
+    constructor()
+    {
+        this.gameWidth = GAME_WIDTH;
+        this.gameHeight = GAME_HEIGHT;
+
+
+    }
+    
+
+    drawLine(ctx,startX,startY,endX,endY)
+    {   ctx.strokeStyle = 'rgb(255,131,0)';
+        ctx.lineWidth =2;
+
+        ctx.beginPath();
+        ctx.moveTo(startX,startY);
+        ctx.lineTo(endX,endY);
+        ctx.stroke();
+    }
+    drawCircle(ctx)
+    {
+        ctx.strokeStyle = 'rgb(255,131,0)';
+        ctx.lineWidth =2;
+
+        ctx.beginPath();
+        ctx.arc(400,300,50,0,Math.PI*2,true);
+        
+        ctx.stroke();
+    }
+    draw(ctx)
+    {
+        this.drawLine(ctx,0,200,100,200);
+console.log("lol");
+        this.drawLine(ctx,0,400,100,400);
+
+        this.drawLine(ctx, 100,400,100,200);
+
+        this.drawLine(ctx,800,200,700,200);
+
+        this.drawLine(ctx,800,400,700,400);
+
+        this.drawLine(ctx,700,400,700,200);
+
+        this.drawLine(ctx,400,600,400,350);
+        this.drawLine(ctx,400,250,400,0);
+        this.drawCircle(ctx);
+
+    }
+
+
+}
+
 
 
 
