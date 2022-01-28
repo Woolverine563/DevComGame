@@ -102,7 +102,18 @@ class GameManager {
     }
     update(deltaTime) {
         if(this.gameState === GAMESTATE.PAUSED || this.gameState === GAMESTATE.MENU) return;
-        console.log(collisionHandlerBetweenTanks(this.car, this.car2));
+        if(collisionHandlerBetweenTanks(this.car, this.car2)){
+            this.car.disableInput = true;
+            this.car2.disableInput = true;
+            let temp_x = this.car.velocity.x;
+            let temp_y = this.car.velocity.y;
+            this.car.velocity.x = this.car2.velocity.x * 1.2;
+            this.car.velocity.y = this.car2.velocity.y * 1.2;
+            this.car2.velocity.x = temp_x * 1.2;
+            this.car2.velocity.y = temp_y * 1.2;
+            
+        }
+
         this.gameObjects.forEach(object => {
             object.update(deltaTime);
         });
@@ -129,17 +140,15 @@ class InputHandler {
         document.addEventListener("keydown", (event) => {
             
            if(event.keyCode == 27) game.toogglePause();
-           
-
             tank.input[movement[event.key]] = true;
-            
+            game.car2.input[movementP2[event.key]] = true;
         }
         );
 
 
         document.addEventListener("keyup", (event) => {
             tank.input[movement[event.key]] = false;
-
+            game.car2.input[movementP2[event.key]] = false;
         });
 
         startGame.addEventListener('click',() =>{
@@ -169,7 +178,7 @@ function projections_intersect(object1, object2){
 
     let h_max = Math.max(h1, -h1, h2, -h2);
     let h_min = -h_max;
-    let projection_h = !((sep_height + h_min > object1.height / 2) || (sep_height + h_max < -object1.height / 2));
+    let projection_h = !((sep_height + h_min + 1 > object1.height / 2) || (sep_height + h_max - 1 < -object1.height / 2));
 
     return (projection_h && projection_w);
 }
@@ -192,7 +201,7 @@ function collisionHandler(ball, object) {
     
     let collision_on_width = false;
     let collision_on_height = false
-    if(Math.abs(sep_along_height) < object.height / 2 + ball.size / 2 && Math.abs(sep_along_width) < object.width / 2 + ball.size / 2)
+    if(Math.abs(sep_along_height) < object.height / 2 + ball.size / 2 + 1 && Math.abs(sep_along_width) < object.width / 2 + ball.size / 2 + 1)
     {  
 
         // if(objectLeft+width/2> ballLeft + ball.size/2)
@@ -213,8 +222,8 @@ function collisionHandler(ball, object) {
         // }
 
         if
-        (Math.abs(-Math.abs(sep_along_height) + object.height / 2 + ball.size / 2)
-         < Math.abs(-Math.abs(sep_along_width) + object.width / 2 + ball.size / 2))
+        (Math.abs(-Math.abs(sep_along_height) + object.height / 2 + ball.size / 2 + 1)
+         < Math.abs(-Math.abs(sep_along_width) + object.width / 2 + ball.size / 2 + 1))
         return('w');
         else return('h');
     }
@@ -226,10 +235,7 @@ function collisionHandler(ball, object) {
 }
 
 
-/*function collisionHandlerBetweenWallsTank(object) {
-    let theta = object.rotation;
-    if(theta < 90)
-}*/
+
 function collisionHandlerBetweenWallsBall(ball) {
 
     let ballLeft = ball.position.x;
@@ -302,7 +308,33 @@ function collisionHandlerBetweenWallsBall(ball) {
 
 
 // }
+function collisionHandlerBetweenWallsTank(object){
+    let theta = object.rotation;
+    let x1 = object.width / 2 * Math.cos(theta) + object.height / 2 * Math.sin(theta);
+    let x2 = object.width / 2 * Math.cos(theta) - object.height / 2 * Math.sin(theta);
+    let y1 = object.width / 2 * Math.sin(theta) + object.height / 2 * Math.cos(theta);
+    let y2 = object.width / 2 * Math.sin(theta) - object.height / 2 * Math.cos(theta);
 
+    let top = object.position.y + Math.min(y1, y2);
+    let bottom = object.position.y + Math.max(y1, y2);
+    let right = object.position.x + Math.max(x1, x2);
+    let left = object.position.x + Math.min(x1, x2);
+
+    if(left < 0 || right > object.gameWidth){
+        object.disableInput = true;
+        object.velocity.x = - object.velocity.x;
+        if(left < 0) object.position.x += 1;
+        else object.position.x -= 1;
+
+    }
+
+    if(top < 0 || bottom > object.gameHeight){
+        object.disableInput = true;
+        object.velocity.y = - object.velocity.y;
+        if(top < 0) object.position.y += 1;
+        else object.position.y -= 1;
+    }
+}
 
 
 class Ball {
@@ -338,32 +370,103 @@ class Ball {
     }
 
     update(deltaTime) {
-        
-        if (collisionHandler(this, this.game.car) != false) {
-            if (this.game.car.speed !== 0) {
-                this.speed = 2 * this.game.car.speed;
+        let collision_type = collisionHandler(this, this.game.car)
+        if (collision_type != false) {
+            if(collision_type == 'h'){
+                let v1x = this.velocity.x;
+                let v2x = this.game.car.velocity.x;
+                let v1y = this.velocity.y;
+                let v2y = this.game.car.velocity.y;
+                let theta = this.game.car.rotation;
+                let v1_normal = v1x * Math.cos(theta) + v1y * Math.sin(theta);
+                let v2_normal = v2x * Math.cos(theta) + v2y * Math.sin(theta);
+                let v2_parallel = v2y * Math.cos(theta) - v2x * Math.sin(theta);
+                let v1_parallel = v1y * Math.cos(theta) - v1x * Math.sin(theta);
+                v1_normal = 2 * v2_normal - v1_normal;
+                v2_normal = - 0.8 * v2_normal;
+                this.velocity.x = v1_normal * Math.cos(theta) - v1_parallel * Math.sin(theta);
+                this.velocity.y = v1_normal * Math.sin(theta) + v1_parallel * Math.cos(theta);
+                this.game.car.velocity.x = v2_normal * Math.cos(theta) - v2_parallel * Math.sin(theta);
+                this.game.car.velocity.y = v2_normal * Math.sin(theta) + v2_parallel * Math.cos(theta);
+                this.game.car.disableInput = true;
+            }
 
-                game.car.speed = 0;
-                this.velocity.x = this.speed * Math.cos(this.game.car.rotation);
-                this.velocity.y = this.speed * Math.sin(this.game.car.rotation);
+            if(collision_type == 'w'){
+                let v1x = this.velocity.x;
+                let v2x = this.game.car.velocity.x;
+                let v1y = this.velocity.y;
+                let v2y = this.game.car.velocity.y;
+                let theta = this.game.car.rotation;
+                let v1_normal = - v1x * Math.sin(theta) + v1y * Math.cos(theta);
+                let v2_normal = - v2x * Math.sin(theta) + v2y * Math.cos(theta);
+                let v2_parallel = v2y * Math.sin(theta) + v2x * Math.cos(theta);
+                let v1_parallel = v1y * Math.sin(theta) + v1x * Math.cos(theta);
+                v1_normal = 2 * v2_normal - v1_normal;
+                v2_normal = -0.8 * v2_normal;
+                this.velocity.x = - v1_normal * Math.sin(theta) + v1_parallel * Math.cos(theta);
+                this.velocity.y = v1_normal * Math.cos(theta) + v1_parallel * Math.sin(theta);
+                this.game.car.velocity.x = - v2_normal * Math.sin(theta) + v2_parallel * Math.cos(theta);
+                this.game.car.velocity.y = v2_normal * Math.cos(theta) + v2_parallel * Math.sin(theta);
+                this.game.car.disableInput = true;
+            }
+        }
+        /*if (collisionHandler(this, this.game.car2) != false) {
+            if (this.game.car2.speed !== 0) {
+                this.speed = 2 * this.game.car2.speed;
+
+                game.car2.speed = 0;
+                this.velocity.x = this.speed * Math.cos(this.game.car2.rotation);
+                this.velocity.y = this.speed * Math.sin(this.game.car2.rotation);
             }
             else {
                 this.velocity.x = - 0.80*this.velocity.x;
                 this.velocity.y = - 0.80*this.velocity.y;
             }
-        }
+        }*/
+        let collision_type2 = collisionHandler(this, this.game.car2)
+        if (collision_type2 != false) {
+            if(collision_type2 == 'h'){
+                let v1x = this.velocity.x;
+                let v2x = this.game.car2.velocity.x;
+                let v1y = this.velocity.y;
+                let v2y = this.game.car2.velocity.y;
+                let theta = this.game.car2.rotation;
+                let v1_normal = v1x * Math.cos(theta) + v1y * Math.sin(theta);
+                let v2_normal = v2x * Math.cos(theta) + v2y * Math.sin(theta);
+                let v2_parallel = v2y * Math.cos(theta) - v2x * Math.sin(theta);
+                let v1_parallel = v1y * Math.cos(theta) - v1x * Math.sin(theta);
+                v1_normal = 2 * v2_normal - v1_normal;
+                v2_normal = - 0.8 * v2_normal;
+                this.velocity.x = v1_normal * Math.cos(theta) - v1_parallel * Math.sin(theta);
+                this.velocity.y = v1_normal * Math.sin(theta) + v1_parallel * Math.cos(theta);
+                this.game.car2.velocity.x = v2_normal * Math.cos(theta) - v2_parallel * Math.sin(theta);
+                this.game.car2.velocity.y = v2_normal * Math.sin(theta) + v2_parallel * Math.cos(theta);
+                this.game.car2.disableInput = true;
+            }
 
+            if(collision_type2 == 'w'){
+                let v1x = this.velocity.x;
+                let v2x = this.game.car2.velocity.x;
+                let v1y = this.velocity.y;
+                let v2y = this.game.car2.velocity.y;
+                let theta = this.game.car2.rotation;
+                let v1_normal = - v1x * Math.sin(theta) + v1y * Math.cos(theta);
+                let v2_normal = - v2x * Math.sin(theta) + v2y * Math.cos(theta);
+                let v2_parallel = v2y * Math.sin(theta) + v2x * Math.cos(theta);
+                let v1_parallel = v1y * Math.sin(theta) + v1x * Math.cos(theta);
+                v1_normal = 2 * v2_normal - v1_normal;
+                v2_normal = -0.8 * v2_normal;
+                this.velocity.x = - v1_normal * Math.sin(theta) + v1_parallel * Math.cos(theta);
+                this.velocity.y = v1_normal * Math.cos(theta) + v1_parallel * Math.sin(theta);
+                this.game.car2.velocity.x = - v2_normal * Math.sin(theta) + v2_parallel * Math.cos(theta);
+                this.game.car2.velocity.y = v2_normal * Math.cos(theta) + v2_parallel * Math.sin(theta);
+                this.game.car2.disableInput = true;
+            }
+        }
         collisionHandlerBetweenWallsBall(this);
-        
-            
             this.position.x += this.velocity.x;
             this.position.y += this.velocity.y;
-
-        
-
     }
-
-
 
 }
 
@@ -430,8 +533,6 @@ class Car {
             y: 0
         }
         this.boostTime = 0;
-        
-
     }
 
     // updateVertices()
@@ -470,22 +571,24 @@ class Car {
     }
 
     determineRotation() {
-        if (this.input.left) {
-            if (this.input.down) {
-                this.rotation += this.angularSpeed;
+        if(!this.disableInput){
+            if (this.input.left) {
+                if (this.input.down) {
+                    this.rotation += this.angularSpeed;
 
+                }
+                else if (this.input.up || this.input.boost) {
+                    this.rotation -= this.angularSpeed;
+                }
             }
-            else if (this.input.up || this.input.boost) {
-                this.rotation -= this.angularSpeed;
-            }
-        }
-        else if (this.input.right) {
-            if (this.input.down || this.input.boost) {
-                this.rotation -= this.angularSpeed;
+            else if (this.input.right) {
+                if (this.input.down || this.input.boost) {
+                    this.rotation -= this.angularSpeed;
 
-            }
-            else if (this.input.up) {
-                this.rotation += this.angularSpeed;
+                }
+                else if (this.input.up) {
+                    this.rotation += this.angularSpeed;
+                }
             }
         }
     }
@@ -507,7 +610,7 @@ class Car {
         }
         if(this.disableInputDuration > 300)
         {   console.log(this.disableInputDuration);
-            this.disableInputDuration =0;
+            this.disableInputDuration = 0;
             this.disableInput = false;
         }
         if(this.input.boost)
@@ -522,7 +625,7 @@ class Car {
         this.updateVelocity();
         this.determineRotation();
 
-
+        collisionHandlerBetweenWallsTank(this);
 
         // if(this.speed<this.maxSpeed){
         // this.speed += this.currentAcc;
