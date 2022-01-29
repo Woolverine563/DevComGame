@@ -5,7 +5,7 @@
 
 
 ### Game Description:
-The major inspiration of this game was Rocket League. We tried to implement the core features but in a 2D top down mode. It is essentially a 2P local mutiplayer game. The first player to score 5 points wins. We have tried to make the game fast-paced and replayable. Thanks for Playing!!! <3
+The major inspiration for this game was Rocket League. We tried to implement its core features but in a 2D top down mode. It is essentially a 2P local mutiplayer game. The first player to score 5 points wins. We have tried to make the game fast-paced and replayable. Thanks for Playing!!! <3
 
 
 
