@@ -53,8 +53,13 @@ class GameManager {
         this.gameState = GAMESTATE.MENU;
         this.car = new Car(this);
         this.car2 = new Car(this);
-        this.car2.position.x = 500;
         this.ball = new Ball(this);
+        this.car2.position.x = 100;
+        this.car2.position.y = 300;
+        this.car.position.x = 700;
+        this.car.position.y = 300;
+        this.ball.position.x = 600;
+        this.ball.position.y = 300;
         this.IH1 = new InputHandler(this.car, this);
         this.gameObjects = [];
 
@@ -197,13 +202,18 @@ function collisionHandler(ball, object) {
     let theta = object.rotation;
     
     let sep_along_width = (ball_x - car_x) * Math.cos(theta) + (ball_y - car_y) * Math.sin(theta);
-    let sep_along_height = (ball_x - car_x) * Math.sin(theta) - (ball_y - car_y) * Math.cos(theta)
+    let sep_along_height = (ball_x - car_x) * Math.sin(theta) - (ball_y - car_y) * Math.cos(theta);
     
-    let collision_on_width = false;
-    let collision_on_height = false
-    if(Math.abs(sep_along_height) < object.height / 2 + ball.size / 2 + 1 && Math.abs(sep_along_width) < object.width / 2 + ball.size / 2 + 1)
-    {  
+    let gap_h = Math.abs(sep_along_height) - object.height / 2 - ball.size / 2 - 2;
+    let gap_w = Math.abs(sep_along_width) - object.width / 2 - ball.size / 2 - 2;
 
+    /*let s_h = Math.abs(sep_along_height) - object.height / 2 - 2;
+    let s_w = Math.abs(sep_along_width) - object.width / 2 - 2;
+    console.log(s_w, s_h);
+    let condition_edges = (s_h * s_w <= 0) && (gap_h <= 0) && (gap_w <= 0);
+    let condition_corners = (s_h >= 0 && s_w >= 0 && (((s_h * s_h) + (s_w * s_w)) <= (ball.size * ball.size / 4)));
+    if(condition_edges || condition_corners)*/
+    if(gap_h <= 0 && gap_w <= 0){  
         // if(objectLeft+width/2> ballLeft + ball.size/2)
         // {
         //     ball.position.x = objectLeft -ball.size;
@@ -220,12 +230,60 @@ function collisionHandler(ball, object) {
         // {
         //     ball.position.y = objectTop - ball.size;
         // }
+        if(Math.abs(gap_h) <= Math.abs(gap_w)){ //collides with width
+                let theta = object.rotation;
+                let displaceAlongHeight = sep_along_height * (Math.abs(gap_h) + 2) / Math.abs(sep_along_height);
+                //ball.position.x += displaceAlongHeight * Math.sin(theta);
+                //ball.position.y -= displaceAlongHeight * Math.cos(theta);
+                
+                console.log('w');
+                console.log(gap_h);
+                let v1x = ball.velocity.x;
+                let v2x = object.velocity.x;
+                let v1y = ball.velocity.y;
+                let v2y = object.velocity.y;
 
-        if
-        (Math.abs(-Math.abs(sep_along_height) + object.height / 2 + ball.size / 2 + 1)
-         < Math.abs(-Math.abs(sep_along_width) + object.width / 2 + ball.size / 2 + 1))
-        return('w');
-        else return('h');
+                let v1_normal = - v1x * Math.sin(theta) + v1y * Math.cos(theta);
+                let v2_normal = - v2x * Math.sin(theta) + v2y * Math.cos(theta);
+                let v2_parallel = v2y * Math.sin(theta) + v2x * Math.cos(theta);
+                let v1_parallel = v1y * Math.sin(theta) + v1x * Math.cos(theta);
+                let copy = v1_normal;
+                v1_normal = 2 * v2_normal - v1_normal;
+                v2_normal += (copy - v2_normal) * 0.2;
+                ball.velocity.x = - v1_normal * Math.sin(theta) + v1_parallel * Math.cos(theta);
+                ball.velocity.y = v1_normal * Math.cos(theta) + v1_parallel * Math.sin(theta);
+                object.velocity.x = - v2_normal * Math.sin(theta) + v2_parallel * Math.cos(theta);
+                object.velocity.y = v2_normal * Math.cos(theta) + v2_parallel * Math.sin(theta);
+
+                object.disableInput = true;
+        }
+        else{
+                let theta = object.rotation;
+                let displaceAlongWidth = sep_along_width * (Math.abs(gap_w) + 2) / Math.abs(sep_along_width);
+                //ball.position.x += displaceAlongWidth * Math.cos(theta);
+                //ball.position.y += displaceAlongWidth * Math.sin(theta);
+
+                console.log('h');
+                console.log(gap_w);
+                let v1x = ball.velocity.x;
+                let v2x = object.velocity.x;
+                let v1y = ball.velocity.y;
+                let v2y = object.velocity.y;
+                let v1_normal = v1x * Math.cos(theta) + v1y * Math.sin(theta);
+                let v2_normal = v2x * Math.cos(theta) + v2y * Math.sin(theta);
+                let v2_parallel = v2y * Math.cos(theta) - v2x * Math.sin(theta);
+                let v1_parallel = v1y * Math.cos(theta) - v1x * Math.sin(theta);
+                let copy = v1_normal;
+                v1_normal = 2 * v2_normal - v1_normal;
+                v2_normal += (copy - v2_normal) * 0.2;
+                ball.velocity.x = v1_normal * Math.cos(theta) - v1_parallel * Math.sin(theta);
+                ball.velocity.y = v1_normal * Math.sin(theta) + v1_parallel * Math.cos(theta);
+                object.velocity.x = v2_normal * Math.cos(theta) - v2_parallel * Math.sin(theta);
+                object.velocity.y = v2_normal * Math.sin(theta) + v2_parallel * Math.cos(theta);
+
+                object.disableInput = true;
+        }
+        
     }
 
 
@@ -315,24 +373,24 @@ function collisionHandlerBetweenWallsTank(object){
     let y1 = object.width / 2 * Math.sin(theta) + object.height / 2 * Math.cos(theta);
     let y2 = object.width / 2 * Math.sin(theta) - object.height / 2 * Math.cos(theta);
 
-    let top = object.position.y + Math.min(y1, y2);
-    let bottom = object.position.y + Math.max(y1, y2);
-    let right = object.position.x + Math.max(x1, x2);
-    let left = object.position.x + Math.min(x1, x2);
+    let top = object.position.y + Math.min(y1, y2, -y1, -y2);
+    let bottom = object.position.y + Math.max(y1, y2, -y1, -y2);
+    let right = object.position.x + Math.max(x1, x2, -x1, -x2);
+    let left = object.position.x + Math.min(x1, x2, -x1, -x2);
 
     if(left < 0 || right > object.gameWidth){
         object.disableInput = true;
         object.velocity.x = - object.velocity.x;
-        if(left < 0) object.position.x += 1;
-        else object.position.x -= 1;
+        if(left < 0) object.position.x -= 2 * left;
+        else object.position.x -= 2 * (right - object.gameWidth);
 
     }
 
     if(top < 0 || bottom > object.gameHeight){
         object.disableInput = true;
         object.velocity.y = - object.velocity.y;
-        if(top < 0) object.position.y += 1;
-        else object.position.y -= 1;
+        if(top < 0) object.position.y -= 2 * top;
+        else object.position.y -= 2 * (bottom - object.gameHeight);
     }
 }
 
@@ -355,6 +413,7 @@ class Ball {
         };
         this.ball = document.getElementById("projectile");
         this.speed = 0;
+        this.maxSpeed = 9;
         this.velocity =
         {
             x: 0,
@@ -370,7 +429,14 @@ class Ball {
     }
 
     update(deltaTime) {
-        let collision_type = collisionHandler(this, this.game.car)
+        this.speed = Math.sqrt(this.velocity.x * this.velocity.x + this.velocity.y * this.velocity.y);
+        if(this.speed > this.maxSpeed){
+            this.velocity.x *= this.maxSpeed / this.speed;
+            this.velocity.y *= this.maxSpeed / this.speed;
+        }
+        collisionHandler(this, this.game.car);
+        collisionHandler(this, this.game.car2);
+        /*let collision_type = collisionHandler(this, this.game.car)
         if (collision_type != false) {
             if(collision_type == 'h'){
                 let v1x = this.velocity.x;
@@ -382,12 +448,18 @@ class Ball {
                 let v2_normal = v2x * Math.cos(theta) + v2y * Math.sin(theta);
                 let v2_parallel = v2y * Math.cos(theta) - v2x * Math.sin(theta);
                 let v1_parallel = v1y * Math.cos(theta) - v1x * Math.sin(theta);
+                let copy = v1_normal;
                 v1_normal = 2 * v2_normal - v1_normal;
-                v2_normal = - 0.8 * v2_normal;
+                v2_normal += (copy - v2_normal) * 0.2;
                 this.velocity.x = v1_normal * Math.cos(theta) - v1_parallel * Math.sin(theta);
                 this.velocity.y = v1_normal * Math.sin(theta) + v1_parallel * Math.cos(theta);
                 this.game.car.velocity.x = v2_normal * Math.cos(theta) - v2_parallel * Math.sin(theta);
                 this.game.car.velocity.y = v2_normal * Math.sin(theta) + v2_parallel * Math.cos(theta);
+
+                let displaceAlongWidth = 2 * sep_along_width * gap_w / Math.abs(sep_along_width);
+                ball.position.x += displaceAlongWidth * Math.cos(theta);
+                ball.position.y += displaceAlongWidth * Math.sin(theta);
+
                 this.game.car.disableInput = true;
             }
 
@@ -401,15 +473,21 @@ class Ball {
                 let v2_normal = - v2x * Math.sin(theta) + v2y * Math.cos(theta);
                 let v2_parallel = v2y * Math.sin(theta) + v2x * Math.cos(theta);
                 let v1_parallel = v1y * Math.sin(theta) + v1x * Math.cos(theta);
+                let copy = v1_normal;
                 v1_normal = 2 * v2_normal - v1_normal;
-                v2_normal = -0.8 * v2_normal;
+                v2_normal += (copy - v2_normal) * 0.2;
                 this.velocity.x = - v1_normal * Math.sin(theta) + v1_parallel * Math.cos(theta);
                 this.velocity.y = v1_normal * Math.cos(theta) + v1_parallel * Math.sin(theta);
                 this.game.car.velocity.x = - v2_normal * Math.sin(theta) + v2_parallel * Math.cos(theta);
                 this.game.car.velocity.y = v2_normal * Math.cos(theta) + v2_parallel * Math.sin(theta);
+
+                let displaceAlongHeight = 2 * sep_along_height * gap_h / Math.abs(sep_along_height);
+                ball.position.x += displaceAlongHeight * Math.sin(theta);
+                position.y -= displaceAlongHeight * Math.cos(theta);
+
                 this.game.car.disableInput = true;
             }
-        }
+        }*/
         /*if (collisionHandler(this, this.game.car2) != false) {
             if (this.game.car2.speed !== 0) {
                 this.speed = 2 * this.game.car2.speed;
@@ -423,7 +501,7 @@ class Ball {
                 this.velocity.y = - 0.80*this.velocity.y;
             }
         }*/
-        let collision_type2 = collisionHandler(this, this.game.car2)
+        /*let collision_type2 = collisionHandler(this, this.game.car2)
         if (collision_type2 != false) {
             if(collision_type2 == 'h'){
                 let v1x = this.velocity.x;
@@ -435,12 +513,18 @@ class Ball {
                 let v2_normal = v2x * Math.cos(theta) + v2y * Math.sin(theta);
                 let v2_parallel = v2y * Math.cos(theta) - v2x * Math.sin(theta);
                 let v1_parallel = v1y * Math.cos(theta) - v1x * Math.sin(theta);
+                let copy = v1_normal;
                 v1_normal = 2 * v2_normal - v1_normal;
-                v2_normal = - 0.8 * v2_normal;
+                v2_normal += (copy - v2_normal) * 0.2;
                 this.velocity.x = v1_normal * Math.cos(theta) - v1_parallel * Math.sin(theta);
                 this.velocity.y = v1_normal * Math.sin(theta) + v1_parallel * Math.cos(theta);
                 this.game.car2.velocity.x = v2_normal * Math.cos(theta) - v2_parallel * Math.sin(theta);
                 this.game.car2.velocity.y = v2_normal * Math.sin(theta) + v2_parallel * Math.cos(theta);
+
+                let displaceAlongWidth = 2 * sep_along_width * gap_w / Math.abs(sep_along_width);
+                ball.position.x += displaceAlongWidth * Math.cos(theta);
+                ball.position.y += displaceAlongWidth * Math.sin(theta);
+
                 this.game.car2.disableInput = true;
             }
 
@@ -454,18 +538,26 @@ class Ball {
                 let v2_normal = - v2x * Math.sin(theta) + v2y * Math.cos(theta);
                 let v2_parallel = v2y * Math.sin(theta) + v2x * Math.cos(theta);
                 let v1_parallel = v1y * Math.sin(theta) + v1x * Math.cos(theta);
+                let copy = v1_normal;
                 v1_normal = 2 * v2_normal - v1_normal;
-                v2_normal = -0.8 * v2_normal;
+                v2_normal += (copy - v2_normal) * 0.2;
                 this.velocity.x = - v1_normal * Math.sin(theta) + v1_parallel * Math.cos(theta);
                 this.velocity.y = v1_normal * Math.cos(theta) + v1_parallel * Math.sin(theta);
                 this.game.car2.velocity.x = - v2_normal * Math.sin(theta) + v2_parallel * Math.cos(theta);
                 this.game.car2.velocity.y = v2_normal * Math.cos(theta) + v2_parallel * Math.sin(theta);
+
+                let displaceAlongHeight = 2 * sep_along_height * gap_h / Math.abs(sep_along_height);
+                ball.position.x += displaceAlongHeight * Math.sin(theta);
+                position.y -= displaceAlongHeight * Math.cos(theta);
+
                 this.game.car2.disableInput = true;
             }
-        }
+
+
+        }*/
         collisionHandlerBetweenWallsBall(this);
-            this.position.x += this.velocity.x;
-            this.position.y += this.velocity.y;
+        this.position.x += this.velocity.x;
+        this.position.y += this.velocity.y;
     }
 
 }
@@ -609,14 +701,14 @@ class Car {
             this.disableInputDuration += deltaTime;
         }
         if(this.disableInputDuration > 300)
-        {   console.log(this.disableInputDuration);
+        {   //console.log(this.disableInputDuration);
             this.disableInputDuration = 0;
             this.disableInput = false;
         }
         if(this.input.boost)
         {
             this.boostTime += deltaTime;
-            console.log(this.boostTime);
+           // console.log(this.boostTime);
         }
         if(this.boostTime>0 && !this.input.boost)
         {
