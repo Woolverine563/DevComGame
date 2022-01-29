@@ -6,6 +6,9 @@ const GAME_HEIGHT = 600;
 let score1 = 0;
 let score2 = 0;
 
+let nitro1 = 100;
+let nitro2 = 100;
+
 let canvas = document.getElementById("gameScreen");
 
 let ctx = canvas.getContext("2d");
@@ -26,6 +29,14 @@ settingsMenu.style.display = 'none';
 let scoreP1 = document.getElementById('scP1');
 let scoreP2 = document.getElementById('scP2');
 
+
+let nitroP1 = document.getElementById('nitro1');
+let nitroP2 = document.getElementById('nitro2');
+
+nitroP1.style.display = 'none';
+nitroP2.style.display = 'none';
+nitroP1.textContent = String(nitro1);
+        nitroP2.textContent = String(nitro2);
 scoreP1.style.display = 'none';
 scoreP2.style.display = 'none';
 
@@ -70,16 +81,16 @@ class GameManager {
 
 
         this.gameState = GAMESTATE.MENU;
-        this.car = new Car(car1img);
+        this.car = new Car(car1img,nitro1);
         // this.car.rotation = Math.PI/2;
         this.car.position.x = 100;
-        
 
-        this.car2 = new Car(car2img);
+
+        this.car2 = new Car(car2img,nitro2);
         this.car2.rotation = Math.PI;
         this.ball = new Ball(this);
         this.IH1 = new InputHandler(this);
-        this.particle = new Particle(400, 300,)
+
         this.startReset = false;
         this.countdown = 0;
         this.calledOnce = false;
@@ -101,16 +112,20 @@ class GameManager {
         score2 = 0;
         scoreP1.textContent = String(score1);
         scoreP2.textContent = String(score2);
-        
+        nitro1 = 100;
+        nitro2 = 100;
+        nitroP1.textContent = String(nitro1);
+        nitroP2.textContent = String(nitro2);
+
 
     }
     resetToStart() {
-        this.car = new Car(car1img);
+        this.car = new Car(car1img,nitro1);
         this.car.position.x = 100;
 
-        this.car2 = new Car(car2img);
+        this.car2 = new Car(car2img,nitro2);
         this.car2.rotation = Math.PI;
-        
+
         this.ball = new Ball(this);
         this.IH1.car = this.car;
         this.IH1.car2 = this.car2;
@@ -120,12 +135,16 @@ class GameManager {
         this.calledOnce = false;
         scoreP1.style.display = 'none';
         scoreP2.style.display = 'none';
-        
+        nitroP1.style.display = 'none';
+        nitroP2.style.display = 'none';
+
     }
     start() {
 
         scoreP1.style.display = 'flex';
         scoreP2.style.display = 'flex';
+        nitroP1.style.display = 'flex';
+        nitroP2.style.display = 'flex';
 
         this.gameState = GAMESTATE.RUNNING;
         this.gameObjects = [this.car, this.car2, this.ball];
@@ -134,6 +153,8 @@ class GameManager {
     }
 
     draw(ctx) {
+        drawLine(ctx,0,500,this.car.nitro*3,500,"red");
+        drawLine(ctx,800 - this.car2.nitro*3,500,800,500,"green");
         this.std.draw(ctx);
         this.gameObjects.forEach(object => {
             object.draw(ctx);
@@ -146,6 +167,9 @@ class GameManager {
 
     }
     update(deltaTime) {
+
+        nitroP1.textContent = String(this.car.nitro);
+        nitroP2.textContent = String(this.car2.nitro);
         if (this.gameState === GAMESTATE.PAUSED || this.gameState === GAMESTATE.MENU) return;
 
         this.gameObjects.forEach(object => {
@@ -288,85 +312,83 @@ function collisionHandler(ball, object) {
     let car_x = object.position.x;
     let car_y = object.position.y;
     let theta = object.rotation;
-    
+
     let sep_along_width = (ball_x - car_x) * Math.cos(theta) + (ball_y - car_y) * Math.sin(theta);
     let sep_along_height = (ball_x - car_x) * Math.sin(theta) - (ball_y - car_y) * Math.cos(theta);
-    
+
     let gap_h = Math.abs(sep_along_height) - object.height / 2 - ball.size / 2 - 2;
     let gap_w = Math.abs(sep_along_width) - object.width / 2 - ball.size / 2 - 2;
 
-   
-    if(gap_h <= 0 && gap_w <= 0){  
-        
-        if(Math.abs(gap_h) <= Math.abs(gap_w)){ //collides with width
-                let theta = object.rotation;
-                let displaceAlongHeight = sep_along_height * (Math.abs(gap_h) + 2) / Math.abs(sep_along_height);
 
-                let v1x = ball.velocity.x;
-                let v2x = object.velocity.x;
-                let v1y = ball.velocity.y;
-                let v2y = object.velocity.y;
+    if (gap_h <= 0 && gap_w <= 0) {
 
-                let v1_normal = - v1x * Math.sin(theta) + v1y * Math.cos(theta);
-                let v2_normal = - v2x * Math.sin(theta) + v2y * Math.cos(theta);
-                let v2_parallel = v2y * Math.sin(theta) + v2x * Math.cos(theta);
-                let v1_parallel = v1y * Math.sin(theta) + v1x * Math.cos(theta);
-                let copy = v1_normal;
-                v1_normal = 2 * v2_normal - v1_normal;
-                v2_normal = (copy - v2_normal) * 0.2;
+        if (Math.abs(gap_h) <= Math.abs(gap_w)) { //collides with width
+            let theta = object.rotation;
+            let displaceAlongHeight = sep_along_height * (Math.abs(gap_h) + 2) / Math.abs(sep_along_height);
+
+            let v1x = ball.velocity.x;
+            let v2x = object.velocity.x;
+            let v1y = ball.velocity.y;
+            let v2y = object.velocity.y;
+
+            let v1_normal = - v1x * Math.sin(theta) + v1y * Math.cos(theta);
+            let v2_normal = - v2x * Math.sin(theta) + v2y * Math.cos(theta);
+            let v2_parallel = v2y * Math.sin(theta) + v2x * Math.cos(theta);
+            let v1_parallel = v1y * Math.sin(theta) + v1x * Math.cos(theta);
+            let copy = v1_normal;
+            v1_normal = 2 * v2_normal - v1_normal;
+            v2_normal = (copy - v2_normal) * 0.2;
 
 
-                ball.velocity.x = - v1_normal * Math.sin(theta) + v1_parallel * Math.cos(theta);
-                ball.velocity.y = v1_normal * Math.cos(theta) + v1_parallel * Math.sin(theta);
+            ball.velocity.x = - v1_normal * Math.sin(theta) + v1_parallel * Math.cos(theta);
+            ball.velocity.y = v1_normal * Math.cos(theta) + v1_parallel * Math.sin(theta);
 
-                ball.speed = Math.sqrt(Math.pow(ball.velocity.x,2)+Math.pow(ball.velocity.y,2));
-                    if(ball.speed> ball.maxSpeed)
-                    {
-                        ball.velocity.x = ball.velocity.x/ball.speed*ball.maxSpeed;
-                        ball.velocity.y = ball.velocity.y/ball.speed*ball.maxSpeed;
-                    }
-                object.velocity.x = - v2_normal * Math.sin(theta) + v2_parallel * Math.cos(theta);
-                object.velocity.y = v2_normal * Math.cos(theta) + v2_parallel * Math.sin(theta);
+            ball.speed = Math.sqrt(Math.pow(ball.velocity.x, 2) + Math.pow(ball.velocity.y, 2));
+            if (ball.speed > ball.maxSpeed) {
+                ball.velocity.x = ball.velocity.x / ball.speed * ball.maxSpeed;
+                ball.velocity.y = ball.velocity.y / ball.speed * ball.maxSpeed;
+            }
+            object.velocity.x = - v2_normal * Math.sin(theta) + v2_parallel * Math.cos(theta);
+            object.velocity.y = v2_normal * Math.cos(theta) + v2_parallel * Math.sin(theta);
 
-                object.disableInput = true;
+            object.disableInput = true;
         }
-        else{
-                let theta = object.rotation;
-                let displaceAlongWidth = sep_along_width * (Math.abs(gap_w) + 2) / Math.abs(sep_along_width);
-                //ball.position.x += displaceAlongWidth * Math.cos(theta);
-                //ball.position.y += displaceAlongWidth * Math.sin(theta);
+        else {
+            let theta = object.rotation;
+            let displaceAlongWidth = sep_along_width * (Math.abs(gap_w) + 2) / Math.abs(sep_along_width);
+            //ball.position.x += displaceAlongWidth * Math.cos(theta);
+            //ball.position.y += displaceAlongWidth * Math.sin(theta);
 
-                
-                let v1x = ball.velocity.x;
-                let v2x = object.velocity.x;
-                let v1y = ball.velocity.y;
-                let v2y = object.velocity.y;
-                let v1_normal = v1x * Math.cos(theta) + v1y * Math.sin(theta);
-                let v2_normal = v2x * Math.cos(theta) + v2y * Math.sin(theta);
-                let v2_parallel = v2y * Math.cos(theta) - v2x * Math.sin(theta);
-                let v1_parallel = v1y * Math.cos(theta) - v1x * Math.sin(theta);
-                let copy = v1_normal;
-                v1_normal = 2 * v2_normal - v1_normal;
-                v2_normal = (copy - v2_normal) * 0.2;
-                ball.velocity.x = v1_normal * Math.cos(theta) - v1_parallel * Math.sin(theta);
-                ball.velocity.y = v1_normal * Math.sin(theta) + v1_parallel * Math.cos(theta);
 
-                ball.speed = Math.sqrt(Math.pow(ball.velocity.x,2)+Math.pow(ball.velocity.y,2));
-                    if(ball.speed> ball.maxSpeed)
-                    {
-                        ball.velocity.x = ball.velocity.x/ball.speed*ball.maxSpeed;
-                        ball.velocity.y = ball.velocity.y/ball.speed*ball.maxSpeed;
-                    }
-                object.velocity.x = v2_normal * Math.cos(theta) - v2_parallel * Math.sin(theta);
-                object.velocity.y = v2_normal * Math.sin(theta) + v2_parallel * Math.cos(theta);
+            let v1x = ball.velocity.x;
+            let v2x = object.velocity.x;
+            let v1y = ball.velocity.y;
+            let v2y = object.velocity.y;
+            let v1_normal = v1x * Math.cos(theta) + v1y * Math.sin(theta);
+            let v2_normal = v2x * Math.cos(theta) + v2y * Math.sin(theta);
+            let v2_parallel = v2y * Math.cos(theta) - v2x * Math.sin(theta);
+            let v1_parallel = v1y * Math.cos(theta) - v1x * Math.sin(theta);
+            let copy = v1_normal;
+            v1_normal = 2 * v2_normal - v1_normal;
+            v2_normal = (copy - v2_normal) * 0.2;
+            ball.velocity.x = v1_normal * Math.cos(theta) - v1_parallel * Math.sin(theta);
+            ball.velocity.y = v1_normal * Math.sin(theta) + v1_parallel * Math.cos(theta);
 
-                object.disableInput = true;
+            ball.speed = Math.sqrt(Math.pow(ball.velocity.x, 2) + Math.pow(ball.velocity.y, 2));
+            if (ball.speed > ball.maxSpeed) {
+                ball.velocity.x = ball.velocity.x / ball.speed * ball.maxSpeed;
+                ball.velocity.y = ball.velocity.y / ball.speed * ball.maxSpeed;
+            }
+            object.velocity.x = v2_normal * Math.cos(theta) - v2_parallel * Math.sin(theta);
+            object.velocity.y = v2_normal * Math.sin(theta) + v2_parallel * Math.cos(theta);
+
+            object.disableInput = true;
         }
-        
+
     }
 
 
-   
+
 }
 
 
@@ -382,18 +404,18 @@ function collisionHandlerBetweenWallsCar(object) {
     let right = object.position.x + Math.max(x1, x2, -x1, -x2);
     let left = object.position.x + Math.min(x1, x2, -x1, -x2);
 
-    if(left < 0 || right > GAME_WIDTH){
+    if (left < 0 || right > GAME_WIDTH) {
         object.disableInput = true;
         object.velocity.x = - object.velocity.x;
-        if(left < 0) object.position.x -= 2 * left;
+        if (left < 0) object.position.x -= 2 * left;
         else object.position.x -= 2 * (right - GAME_WIDTH);
 
     }
 
-    if(top < 0 || bottom > GAME_HEIGHT){
+    if (top < 0 || bottom > GAME_HEIGHT) {
         object.disableInput = true;
         object.velocity.y = - object.velocity.y;
-        if(top < 0) object.position.y -= 2 * top;
+        if (top < 0) object.position.y -= 2 * top;
         else object.position.y -= 2 * (bottom - GAME_HEIGHT);
     }
 }
@@ -464,7 +486,24 @@ function collisionHandlerBetweenWallsBall(ball) {
     }
 
 }
+function drawLine(ctx, startX, startY, endX, endY,colour) {
+    ctx.strokeStyle = colour;
+    ctx.lineWidth = 2;
 
+    ctx.beginPath();
+    ctx.moveTo(startX, startY);
+    ctx.lineTo(endX, endY);
+    ctx.stroke();
+}
+function drawCircle(ctx) {
+    ctx.strokeStyle = 'rgb(255,131,0)';
+    ctx.lineWidth = 2;
+
+    ctx.beginPath();
+    ctx.arc(400, 300, 50, 0, Math.PI * 2, true);
+
+    ctx.stroke();
+}
 
 
 class Stadium {
@@ -476,41 +515,23 @@ class Stadium {
 
     }
 
-
-    drawLine(ctx, startX, startY, endX, endY) {
-        ctx.strokeStyle = 'rgb(255,131,0)';
-        ctx.lineWidth = 2;
-
-        ctx.beginPath();
-        ctx.moveTo(startX, startY);
-        ctx.lineTo(endX, endY);
-        ctx.stroke();
-    }
-    drawCircle(ctx) {
-        ctx.strokeStyle = 'rgb(255,131,0)';
-        ctx.lineWidth = 2;
-
-        ctx.beginPath();
-        ctx.arc(400, 300, 50, 0, Math.PI * 2, true);
-
-        ctx.stroke();
-    }
     draw(ctx) {
-        this.drawLine(ctx, 0, 200, 100, 200);
-        this.drawLine(ctx, 0, 400, 100, 400);
+        let colour = 'rgb(255,131,0)';
+        drawLine(ctx, 0, 200, 100, 200,colour);
+        drawLine(ctx, 0, 400, 100, 400,colour);
 
-        this.drawLine(ctx, 100, 400, 100, 200);
+        drawLine(ctx, 100, 400, 100, 200,colour);
 
-        this.drawLine(ctx, 800, 200, 700, 200);
+        drawLine(ctx, 800, 200, 700, 200,colour);
 
-        this.drawLine(ctx, 800, 400, 700, 400);
+        drawLine(ctx, 800, 400, 700, 400,colour);
 
-        this.drawLine(ctx, 700, 400, 700, 200);
+    drawLine(ctx, 700, 400, 700, 200,colour);
 
-        this.drawLine(ctx, 400, 600, 400, 350);
-        this.drawLine(ctx, 400, 250, 400, 0);
+        drawLine(ctx, 400, 600, 400, 350,colour);
+        drawLine(ctx, 400, 250, 400, 0,colour);
         // this.drawLine(ctx,0,0,1600,0);
-        this.drawCircle(ctx);
+        drawCircle(ctx);
 
     }
 
@@ -567,8 +588,8 @@ class Ball {
         this.position
             =
         {
-            x: GAME_WIDTH/2 - this.size/2,
-            y: GAME_HEIGHT/2 -this.size/2,
+            x: GAME_WIDTH / 2 - this.size / 2,
+            y: GAME_HEIGHT / 2 - this.size / 2,
         };
         this.maxSpeed = 10;
         // this.position
@@ -598,9 +619,9 @@ class Ball {
     }
 
     update(deltaTime) {
-        
-        collisionHandler(this,this.game.car);
-        collisionHandler(this,this.game.car2);
+
+        collisionHandler(this, this.game.car);
+        collisionHandler(this, this.game.car2);
         collisionHandlerBetweenWallsBall(this);
         this.position.x += this.velocity.x;
         this.position.y += this.velocity.y;
@@ -613,9 +634,9 @@ class Ball {
 
 class Car {
 
-    constructor(carImg) {
+    constructor(carImg,nitro) {
 
-
+        this.nitro = nitro;
         this.input = {
 
             up: false,
@@ -653,7 +674,7 @@ class Car {
             x: 0,
             y: 0
         }
-        this.boostTime = 0;
+        
 
 
     }
@@ -671,7 +692,7 @@ class Car {
 
             }
             else if (this.input.boost) {
-                if (this.boostTime < 1000) {
+                if (this.nitro > 0) {
                     this.speed = this.maxSpeed * 3;
                 }
                 else {
@@ -722,6 +743,7 @@ class Car {
 
 
     draw(ctx) {
+        
         ctx.save();
         ctx.translate(this.position.x, this.position.y);
         ctx.rotate(this.rotation);
@@ -738,18 +760,20 @@ class Car {
             this.disableInput = false;
         }
 
-        if (this.input.boost && this.boostTime < 1000) {
-            this.boostTime += deltaTime;
-
+        if (this.input.boost && this.nitro > 0) {
+            
+            this.nitro -= 1;
+            
         }
-        if (this.boostTime > 0 && !this.input.boost) {
-            this.boostTime -= deltaTime;
+        if (this.nitro < 100 && !this.input.boost) {
+            
+            this.nitro += 1
         }
         this.updateVelocity();
 
         this.determineRotation();
         collisionHandlerBetweenWallsCar(this);
-        
+
 
 
 
