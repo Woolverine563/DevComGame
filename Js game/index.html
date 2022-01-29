@@ -10,8 +10,8 @@
     <style>
         #gameScreen {
             border: 2px solid black;
-            height: 600px;
-            width: 800px;
+            /* height: 600px;
+            width: 800px; */
             /* background-image: url("bg.png"); */
             background-color: rgba(0, 0, 0, 0.8)
         }
@@ -123,41 +123,34 @@
             font-size: large;
         }
 
-        /* #fp1f {
+    #scP1
+    {   
+        position: relative;
+    top: 1px;
+    right: -207px;
+        
+    }
+    #scP2
+    { 
+        position: relative;
+        top: 1px;
+        right: -617px;
 
-            position: absolute;
-            top: 234px;
-            right: 659px;
-            width: 12px;
-            height: 12px;
-        }
+    }
 
-        #fp1b {
+        /* #scoreP2 {
+            width: 46px;
+    height: 100px;
+    top: -6px;
+    right:  1335px;
 
-            top: 267px;
-            right: 659px;
-            width: 12px;
-            height: 12px;
+        } */
 
-        }
-
-        #fp1l {
-
-            position: absolute;
-            top: 310px;
-            right: 659px;
-            width: 12px;
-            height: 12px;
-
-        }
-
-        #fp1r {
-
-            position: absolute;
-            top: 331px;
-            right: 659px;
-            width: 12px;
-            height: 12px;
+        /* #scoreP1 {
+            width: 39px;
+    height: 81px;
+    top: -6px;
+    right: 927px;
 
         } */
     </style>
@@ -167,7 +160,7 @@
 
     <img src="car.png" alt="" id="tank">
     <img src="car2.png" alt="" id="tank2">
-    <img src="ball.png" alt="" id="projectile">
+    
     <!-- <input type="button" value="2v2" id="2v2">
     <input type="button" value="controls" id="Controls"> -->
 
@@ -230,31 +223,7 @@
 
 
         </div>
-        <!-- <div id='fp1f' class="text-white">
 
-            <button class="bg-green-500 text-white rounded-full ">
-                Forward(w)
-            </button>
-        </div>
-        <div id='fp1b' class="text-white">
-
-            <button class="bg-green-500 text-white rounded-full ">
-                Backward(s)
-            </button>
-        </div>
-
-        <div id='fp1l' class="text-white">
-
-            <button class="bg-green-500 text-white rounded-full ">
-                Left(a)
-            </button>
-        </div>
-        <div id='fp1r' class="text-white">
-
-            <button class="bg-green-500 text-white rounded-full ">
-                Right(d)
-            </button>
-        </div> -->
 
 
         <div class="text-center text-white " id="p2c">
@@ -297,7 +266,10 @@
         </div>
 
     </div>
-
+    <div class="fixed text-white text-opacity-50 text-2xl " id="scoreP2">
+        <span id= "scP2">0</span></div>
+    <div class="fixed text-white text-opacity-50 text-2xl " id="scoreP1">
+        <span  id ="scP1">0</span></div>
     <canvas id="gameScreen" width="800" height="600">
 
     </canvas>
