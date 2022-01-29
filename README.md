@@ -16,7 +16,7 @@ Use the car body to defend your goal and to divert the ball towards your opponen
 The first player to score 5 points wins.
 
 
-### Credits 
+### Credits: 
 #### JavaScriptKiddies
 ##### Team Members:
 ###### 1.Ameya Deshmukh(210050011) [**Lead Dev**]
