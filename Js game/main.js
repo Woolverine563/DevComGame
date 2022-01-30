@@ -30,13 +30,13 @@ let scoreP1 = document.getElementById('scP1');
 let scoreP2 = document.getElementById('scP2');
 
 
-let nitroP1 = document.getElementById('nitro1');
-let nitroP2 = document.getElementById('nitro2');
+// let nitroP1 = document.getElementById('nitro1');
+// let nitroP2 = document.getElementById('nitro2');
 
-nitroP1.style.display = 'none';
-nitroP2.style.display = 'none';
-nitroP1.textContent = String(nitro1);
-        nitroP2.textContent = String(nitro2);
+// nitroP1.style.display = 'none';
+// nitroP2.style.display = 'none';
+// nitroP1.textContent = String(nitro1);
+//         nitroP2.textContent = String(nitro2);
 scoreP1.style.display = 'none';
 scoreP2.style.display = 'none';
 
@@ -114,8 +114,8 @@ class GameManager {
         scoreP2.textContent = String(score2);
         nitro1 = 100;
         nitro2 = 100;
-        nitroP1.textContent = String(nitro1);
-        nitroP2.textContent = String(nitro2);
+        // nitroP1.textContent = String(nitro1);
+        // nitroP2.textContent = String(nitro2);
 
 
     }
@@ -135,16 +135,16 @@ class GameManager {
         this.calledOnce = false;
         scoreP1.style.display = 'none';
         scoreP2.style.display = 'none';
-        nitroP1.style.display = 'none';
-        nitroP2.style.display = 'none';
+        // nitroP1.style.display = 'none';
+        // nitroP2.style.display = 'none';
 
     }
     start() {
 
         scoreP1.style.display = 'flex';
         scoreP2.style.display = 'flex';
-        nitroP1.style.display = 'flex';
-        nitroP2.style.display = 'flex';
+        // nitroP1.style.display = 'flex';
+        // nitroP2.style.display = 'flex';
 
         this.gameState = GAMESTATE.RUNNING;
         this.gameObjects = [this.car, this.car2, this.ball];
@@ -168,8 +168,8 @@ class GameManager {
     }
     update(deltaTime) {
 
-        nitroP1.textContent = String(this.car.nitro);
-        nitroP2.textContent = String(this.car2.nitro);
+        // nitroP1.textContent = String(this.car.nitro);
+        // nitroP2.textContent = String(this.car2.nitro);
         if (this.gameState === GAMESTATE.PAUSED || this.gameState === GAMESTATE.MENU) return;
 
         this.gameObjects.forEach(object => {
