@@ -656,7 +656,7 @@ class Car {
         this.height = 0.75 * 25;
 
 
-        this.angularSpeed = 0.03;
+        this.angularSpeed = 0.035;
 
         this.car = carImg;
         this.position =
