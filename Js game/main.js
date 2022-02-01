@@ -1,7 +1,5 @@
-
 const GAME_WIDTH = 800;
 const GAME_HEIGHT = 600;
-
 
 let score1 = 0;
 let score2 = 0;
@@ -28,24 +26,11 @@ settingsMenu.style.display = 'none';
 
 let scoreP1 = document.getElementById('scP1');
 let scoreP2 = document.getElementById('scP2');
-
-
-// let nitroP1 = document.getElementById('nitro1');
-// let nitroP2 = document.getElementById('nitro2');
-
-// nitroP1.style.display = 'none';
-// nitroP2.style.display = 'none';
-// nitroP1.textContent = String(nitro1);
-//         nitroP2.textContent = String(nitro2);
 scoreP1.style.display = 'none';
 scoreP2.style.display = 'none';
 
-
 let car1img = document.getElementById("tank");
 let car2img = document.getElementById("tank2");
-
-
-
 
 const movementP1 =
 {
@@ -70,8 +55,7 @@ const GAMESTATE =
 {
     PAUSED: 0,
     RUNNING: 1,
-    MENU: 2,
-    GAME_OVER: 3
+    MENU: 2
 
 }
 
@@ -82,7 +66,6 @@ class GameManager {
 
         this.gameState = GAMESTATE.MENU;
         this.car = new Car(car1img,nitro1);
-        // this.car.rotation = Math.PI/2;
         this.car.position.x = 100;
 
 
@@ -114,8 +97,6 @@ class GameManager {
         scoreP2.textContent = String(score2);
         nitro1 = 100;
         nitro2 = 100;
-        // nitroP1.textContent = String(nitro1);
-        // nitroP2.textContent = String(nitro2);
 
 
     }
@@ -137,16 +118,14 @@ class GameManager {
         scoreP2.style.display = 'none';
         scoreP1.textContent = String(score1);
         scoreP2.textContent = String(score2);
-        // nitroP1.style.display = 'none';
-        // nitroP2.style.display = 'none';
+
 
     }
     start() {
 
         scoreP1.style.display = 'flex';
         scoreP2.style.display = 'flex';
-        // nitroP1.style.display = 'flex';
-        // nitroP2.style.display = 'flex';
+
 
         this.gameState = GAMESTATE.RUNNING;
         this.gameObjects = [this.car, this.car2, this.ball];
@@ -170,8 +149,7 @@ class GameManager {
     }
     update(deltaTime) {
 
-        // nitroP1.textContent = String(this.car.nitro);
-        // nitroP2.textContent = String(this.car2.nitro);
+
         if (this.gameState === GAMESTATE.PAUSED || this.gameState === GAMESTATE.MENU) return;
 
         this.gameObjects.forEach(object => {
@@ -358,8 +336,6 @@ function collisionHandler(ball, object) {
         else {
             let theta = object.rotation;
             let displaceAlongWidth = sep_along_width * (Math.abs(gap_w) + 2) / Math.abs(sep_along_width);
-            //ball.position.x += displaceAlongWidth * Math.cos(theta);
-            //ball.position.y += displaceAlongWidth * Math.sin(theta);
 
 
             let v1x = ball.velocity.x;
@@ -514,7 +490,6 @@ class Stadium {
         this.gameWidth = GAME_WIDTH;
         this.gameHeight = GAME_HEIGHT;
 
-
     }
 
     draw(ctx) {
@@ -532,16 +507,12 @@ class Stadium {
 
         drawLine(ctx, 400, 600, 400, 350,colour);
         drawLine(ctx, 400, 250, 400, 0,colour);
-        // this.drawLine(ctx,0,0,1600,0);
         drawCircle(ctx);
 
     }
 
 
 }
-
-
-
 
 class Particle {
     constructor(x, y, radius, colour, vX, vY) {
@@ -576,7 +547,6 @@ class Particle {
 
     }
 
-
 }
 
 class Ball {
@@ -594,12 +564,6 @@ class Ball {
             y: GAME_HEIGHT / 2 - this.size / 2,
         };
         this.maxSpeed = 10;
-        // this.position
-        //     =
-        // {
-        //     x: 600,
-        //     y: 300,
-        // };
 
         this.speed = 0;
         this.velocity =
@@ -607,7 +571,6 @@ class Ball {
             x: 0,
             y: 0
         };
-
 
     }
 
@@ -632,8 +595,6 @@ class Ball {
         console.log(this.speed);
     }
 
-
-
 }
 
 class Car {
@@ -653,12 +614,9 @@ class Car {
         this.disableInput = false;
         this.disableInputDuration = 0;
 
-
-
         this.width = 0.75 * 50;
 
         this.height = 0.75 * 25;
-
 
         this.angularSpeed = 0.035/8;
 
@@ -672,18 +630,13 @@ class Car {
         this.maxSpeed = 0.125;
         this.speed = 0;
 
-
         this.velocity =
         {
             x: 0,
             y: 0
         }
         
-
-
     }
-
-
 
     updateVelocity(deltaTime) {
         if (!this.disableInput) {
@@ -703,7 +656,6 @@ class Car {
                     this.speed = this.maxSpeed*deltaTime;
                 }
 
-
             }
             else if (this.input.down == true) {
 
@@ -722,7 +674,6 @@ class Car {
         this.velocity.y = - 0.8 * this.velocity.y;
     }
     determineRotation(deltaTime) {
-        // if (!this.disableInput) {
         if (this.input.left) {
             if (this.input.down) {
                 this.rotation += this.angularSpeed*deltaTime;
@@ -777,16 +728,8 @@ class Car {
 
         this.determineRotation(deltaTime);
         collisionHandlerBetweenWallsCar(this);
-
-
-
-
         this.position.x += this.velocity.x;
         this.position.y += this.velocity.y;
-
-
-
-
 
     }
 
@@ -820,7 +763,7 @@ function gameLoop(timeStamp) {
         if (autoResetTime > 1000) {
             game.reset();
             autoResetTime = 0;
-            console.log("called");
+           
         }
     }
     game.update(deltaTime);
