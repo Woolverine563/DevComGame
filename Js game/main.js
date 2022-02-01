@@ -135,6 +135,8 @@ class GameManager {
         this.calledOnce = false;
         scoreP1.style.display = 'none';
         scoreP2.style.display = 'none';
+        scoreP1.textContent = String(score1);
+        scoreP2.textContent = String(score2);
         // nitroP1.style.display = 'none';
         // nitroP2.style.display = 'none';
 
@@ -459,7 +461,7 @@ function collisionHandlerBetweenWallsBall(ball) {
 
             }
             score1++;
-            scoreP1.textContent = String(score1);
+            scoreP1.textContent = 'GOAL!!!';
 
             game.calledOnce = true;
         }
@@ -477,7 +479,7 @@ function collisionHandlerBetweenWallsBall(ball) {
 
             }
             score2++;
-            scoreP2.textContent = String(score2);
+            scoreP2.textContent =  'GOAL!!!';
             game.calledOnce = true;
 
         }
@@ -619,13 +621,15 @@ class Ball {
     }
 
     update(deltaTime) {
-
+        
+        this.speed = Math.sqrt(Math.pow(this.velocity.x,2)+Math.pow(this.velocity.y,2));
         collisionHandler(this, this.game.car);
         collisionHandler(this, this.game.car2);
         collisionHandlerBetweenWallsBall(this);
+
         this.position.x += this.velocity.x;
         this.position.y += this.velocity.y;
-
+        console.log(this.speed);
     }
 
 
@@ -656,7 +660,7 @@ class Car {
         this.height = 0.75 * 25;
 
 
-        this.angularSpeed = 0.035;
+        this.angularSpeed = 0.035/8;
 
         this.car = carImg;
         this.position =
@@ -665,7 +669,7 @@ class Car {
             y: 300
         }
         this.rotation = 0;
-        this.maxSpeed = 2;
+        this.maxSpeed = 0.2;
         this.speed = 0;
 
 
@@ -681,29 +685,29 @@ class Car {
 
 
 
-    updateVelocity() {
+    updateVelocity(deltaTime) {
         if (!this.disableInput) {
             if (this.input.up == true && !this.input.boost) {
 
 
-                this.speed = this.maxSpeed;
+                this.speed = this.maxSpeed*deltaTime;
 
 
 
             }
             else if (this.input.boost) {
                 if (this.nitro > 0) {
-                    this.speed = this.maxSpeed * 3;
+                    this.speed = this.maxSpeed*deltaTime * 3;
                 }
                 else {
-                    this.speed = this.maxSpeed;
+                    this.speed = this.maxSpeed*deltaTime;
                 }
 
 
             }
             else if (this.input.down == true) {
 
-                this.speed = -this.maxSpeed;
+                this.speed = -this.maxSpeed*deltaTime;
 
             }
             else if (this.input.up == false && this.input.down == false) {
@@ -717,24 +721,24 @@ class Car {
         this.velocity.x = - 0.8 * this.velocity.x;
         this.velocity.y = - 0.8 * this.velocity.y;
     }
-    determineRotation() {
+    determineRotation(deltaTime) {
         // if (!this.disableInput) {
         if (this.input.left) {
             if (this.input.down) {
-                this.rotation += this.angularSpeed;
+                this.rotation += this.angularSpeed*deltaTime;
 
             }
             else if (this.input.up || this.input.boost) {
-                this.rotation -= this.angularSpeed;
+                this.rotation -= this.angularSpeed*deltaTime;
             }
         }
         else if (this.input.right) {
             if (this.input.down || this.input.boost) {
-                this.rotation -= this.angularSpeed;
+                this.rotation -= this.angularSpeed*deltaTime;
 
             }
             else if (this.input.up) {
-                this.rotation += this.angularSpeed;
+                this.rotation += this.angularSpeed*deltaTime;
             }
         }
 
@@ -769,9 +773,9 @@ class Car {
             
             this.nitro += 1
         }
-        this.updateVelocity();
+        this.updateVelocity(deltaTime);
 
-        this.determineRotation();
+        this.determineRotation(deltaTime);
         collisionHandlerBetweenWallsCar(this);
 
 
