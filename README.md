@@ -13,6 +13,7 @@ The major inspiration for this game was Rocket League. We tried to implement its
 Use WASD to move player 1 and E to active nitros. 
 Use IJKL to move player 2 and O to active nitros. 
 Use the car body to defend your goal and to divert the ball towards your opponent's goal
+Press Esc to Pause the game.
 The first player to score 5 points wins.
 
 ### Link
