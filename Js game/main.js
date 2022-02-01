@@ -669,7 +669,7 @@ class Car {
             y: 300
         }
         this.rotation = 0;
-        this.maxSpeed = 0.2;
+        this.maxSpeed = 0.125;
         this.speed = 0;
 
 
