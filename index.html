@@ -10,10 +10,10 @@
     <style>
         #gameScreen {
             border: 2px solid black;
-            height: 600px;
-            width: 800px;
+            /* height: 600px;
+            width: 800px; */
             /* background-image: url("bg.png"); */
-            background-color: rgba(0, 0, 0, 0.8)
+            background-color: rgba(0, 0, 0, 0.9)
         }
 
         #main {
@@ -123,51 +123,40 @@
             font-size: large;
         }
 
-        /* #fp1f {
+    #scP1
+    {   
+        position: relative;
+    top: 1px;
+    right: -207px;
+        
+    }
+    #scP2
+    { 
+        position: relative;
+        top: 1px;
+        right: -617px;
 
-            position: absolute;
-            top: 234px;
-            right: 659px;
-            width: 12px;
-            height: 12px;
-        }
+    }
+/* 
+      #nitro1{
+        position: relative;
+    top: 508px;
+    right: -207px;
+      }
 
-        #fp1b {
-
-            top: 267px;
-            right: 659px;
-            width: 12px;
-            height: 12px;
-
-        }
-
-        #fp1l {
-
-            position: absolute;
-            top: 310px;
-            right: 659px;
-            width: 12px;
-            height: 12px;
-
-        }
-
-        #fp1r {
-
-            position: absolute;
-            top: 331px;
-            right: 659px;
-            width: 12px;
-            height: 12px;
-
-        } */
+      #nitro2{
+        position: relative;
+    top: 508px;
+    right: -617px;
+      } */
     </style>
 </head>
 
 <body>
 
-    <img src="car.png" alt="" id="tank">
-    <img src="car2.png" alt="" id="tank2">
-    <img src="ball.png" alt="" id="projectile">
+    <img src="Js game/assets/car.png" alt="" id="tank">
+    <img src="Js game/assets/car2.png" alt="" id="tank2">
+    
     <!-- <input type="button" value="2v2" id="2v2">
     <input type="button" value="controls" id="Controls"> -->
 
@@ -189,14 +178,14 @@
             </div>
 
         </div>
-        <div class="bg-black-500 max-w-md w-full  text-center" id="credits">
+        <!-- <div class="bg-black-500 max-w-md w-full  text-center" id="credits">
             <div>
                 <button class="bg-red-500 text-white w-full py-2 rounded-full">
                     Credits
                 </button>
             </div>
 
-        </div>
+        </div> -->
 
     </div>
 
@@ -230,31 +219,7 @@
 
 
         </div>
-        <!-- <div id='fp1f' class="text-white">
 
-            <button class="bg-green-500 text-white rounded-full ">
-                Forward(w)
-            </button>
-        </div>
-        <div id='fp1b' class="text-white">
-
-            <button class="bg-green-500 text-white rounded-full ">
-                Backward(s)
-            </button>
-        </div>
-
-        <div id='fp1l' class="text-white">
-
-            <button class="bg-green-500 text-white rounded-full ">
-                Left(a)
-            </button>
-        </div>
-        <div id='fp1r' class="text-white">
-
-            <button class="bg-green-500 text-white rounded-full ">
-                Right(d)
-            </button>
-        </div> -->
 
 
         <div class="text-center text-white " id="p2c">
@@ -297,11 +262,20 @@
         </div>
 
     </div>
+    <div class="fixed text-white text-opacity-50 text-2xl " id="scoreP2">
+        <span id= "scP2">0</span></div>
+    <div class="fixed text-white text-opacity-50 text-2xl " id="scoreP1">
+        <span  id ="scP1">0</span></div>
 
+
+        <!-- <div class="fixed text-red-800 text-opacity-50  text-2xl " >
+            <span id= "nitro1">0</span></div>
+        <div class="fixed text-green-800 text-opacity-50 text-2xl ">
+            <span  id ="nitro2">0</span></div> -->
     <canvas id="gameScreen" width="800" height="600">
 
     </canvas>
-    <script src="main.js"></script>
+    <script src="Js game/main.js"></script>
 </body>
 
 </html>
